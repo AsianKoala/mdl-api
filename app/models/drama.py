@@ -23,6 +23,7 @@ class Drama(Base):
     __tablename__ = 'dramas'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    short_id = Column(String, nullable=False)
     full_id = Column(String, nullable=False)
     title = Column(String, nullable=False)
     year = Column(String, nullable=False)
