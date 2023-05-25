@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple
 
 import requests
 import os
@@ -7,7 +7,7 @@ import time
 import re
 from bs4 import BeautifulSoup
 
-class Parser:
+class IDScraper:
     BASE_URL = "https://mydramalist.com"
     START_YEAR = 2000
     END_YEAR = 2023
@@ -68,18 +68,18 @@ class Parser:
         with open(self.cache_fname, 'w') as f:
             json.dump(cache, f)
 
-    def get_all_ids(
+    def crawl(
             self,
             opts: Options,
             sleep_sec: float = 1.0,
         ) -> List[List[str]]:
         result = []
         for year in range(self.START_YEAR, self.END_YEAR + 1):
-            year_ids = self.get_year_ids(year, opts, sleep_sec=sleep_sec)
+            year_ids = self.scrape_year_ids(year, opts, sleep_sec=sleep_sec)
             result.append(year_ids)
         return result
 
-    def get_year_ids(
+    def scrape_year_ids(
             self,
             year: int,
             opts: Options,
@@ -96,14 +96,14 @@ class Parser:
             url = self.__build_search_url(year, page, opts)
             ids = self.parse_page(url)
             if not ids:
-                print("[parser] Skipping page", page)
+                print("[crawler] Skipping page", page)
                 continue
 
             print("[parser] Parsed page", page)
             for id in ids:
                 all_ids.append(id)
 
-        print("[parser] Finished parsing")
+        print("[crawler] Finished crawling")
         return all_ids
 
     def __extract_year_query(self, url: str) -> str:
@@ -155,4 +155,45 @@ class Parser:
             url += "&"
         url += f"re=1890,{end_year}&so=newest&or=desc&page={page}"
         return url
+
+class DramaParser:
+    BASE_URL = "https://mydramalist.com"
+
+    def __init__(self, long_ids: List[str]):
+        self.ids = long_ids
+
+    def scrape(self, id: str) -> BeautifulSoup:
+        r = requests.get(self.BASE_URL + "/" + id)
+        soup = BeautifulSoup(r.content, "html.parser")
+        self.parse_schema(id, soup)
+        return soup
+
+    def parse_schema(self, id: str, soup: BeautifulSoup):
+        short_id = id[:id.find('-')]
+        long_id = id
+        title, year = self.parse_title_year(soup)
+        type = 'Drama'
+        description = self.parse_description(soup)
+        rating = self.parse_rating(soup)
+
+    def parse_title_year(self, soup: BeautifulSoup) -> Tuple[str, str]:
+        pattern = r"(.+) \((\d+)\) -"
+        p = re.compile(pattern)
+        title = soup.find("title").text
+        m = re.search(p, title)
+        return (m.group(1), m.group(2))
+
+    def parse_description(self, soup: BeautifulSoup) -> Optional[str]:
+        try:
+            synopsis = soup.find('div', attrs={'class':'show-synopsis'})
+            descr = synopsis.p.span.text
+            return descr
+        except:
+            return None
+
+    def parse_rating(self, soup: BeautifulSoup) -> float:
+        return float(soup.find('b', attrs={'itempropx':'ratingValue'}).text)
+
+    def parse_num_ratings(self, soup: BeautifulSoup) -> int:
+        text = soup.find('div', attrs={'class':'hfs', 'itempropx':'aggregateRating'})
 
