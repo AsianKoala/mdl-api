@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 
 import uuid
 
-from app.models.base import Base
+from app.db.base_class import Base
 
 movie_genre_association_table = Table(
         "movie_genres",
@@ -26,23 +26,24 @@ class Drama(Base):
     short_id = Column(String, nullable=False)
     full_id = Column(String, nullable=False)
     title = Column(String, nullable=False)
-    year = Column(String, nullable=False)
+    year = Column(Integer, nullable=False)
     type = Column(String, nullable=False)
     description = Column(String, nullable=True)
     rating = Column(Float, nullable=False)
-    num_ratings = Column(Integer, nullable=False)
+    ratings = Column(Integer, nullable=False)
     watchers = Column(Integer, nullable=False)
+    reviews = Column(Integer, nullable=False)
     native_title = Column(String, nullable=True)
     known_as = Column(ARRAY(String), nullable=True)
     screenwriter = Column(String, nullable=True)
     director = Column(String, nullable=True)
     country = Column(String, nullable=False)
     episodes = Column(Integer, nullable=True)
-    start_date = Column(Date, nullable=True)
-    end_date = Column(Date, nullable=True)
-    duration_m = Column(Integer, nullable=True)
+    aired = Column(String, nullable=True)
     aired_on = Column(String, nullable=True)
-    original_network = Column(ARRAY(String), nullable=True)
+    release_date = Column(String, nullable=True)
+    duration = Column(String, nullable=True)
+    original_network = Column(String, nullable=True)
     content_rating = Column(String, nullable=True)
     ranked = Column(Integer, nullable=False)
     popularity = Column(Integer, nullable=False)

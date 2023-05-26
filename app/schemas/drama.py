@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 
 class DramaBase(BaseModel):
@@ -8,20 +8,23 @@ class DramaBase(BaseModel):
     title: str
     year: str
     type: str
-    description: str
+    description: Optional[str]
     rating: float
-    num_ratings: str
+    ratings: int
     watchers: int
-    native_title: str
-    known_as: List[str]
-    screenwriter: str
+    reviews: int
+    native_title: Optional[str]
+    known_as: Optional[List[str]]
+    screenwriter: Optional[str]
+    director: Optional[str]
     country: str
-    start_date: datetime
-    end_date: datetime
-    duration_m: datetime
-    aired_on: datetime
-    original_network: List[str]
-    content_rating: str
+    episodes: Optional[int]
+    aired: Optional[str]
+    aired_on: Optional[str]
+    release_date: Optional[str]
+    duration: Optional[str]
+    original_network: Optional[str]
+    content_rating: Optional[str]
     ranked: int
     popularity: int
 

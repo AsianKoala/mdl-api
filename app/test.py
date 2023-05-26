@@ -1,8 +1,9 @@
-from populate import  DramaParser, IDScraper
+from scrapers.scrape import IDScraper
+from scrapers.parse import DramaParser
 
 scraper = IDScraper(force_refresh_cache=False)
 opts = IDScraper.Options(dramas=True)
-parser = DramaParser([])
+parser = DramaParser("1814-always")
 
 
 def parse_search():
@@ -15,6 +16,7 @@ def get_year_ids():
     # parser.write_cache()
 
 def drama_parser():
-    parser.scrape("35729-emergency-lands-of-love")
+    model = parser.parse_model()
+    print(model)
 
 drama_parser()
