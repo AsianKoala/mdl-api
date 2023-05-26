@@ -49,11 +49,13 @@ class Drama(Base):
     popularity = Column(Integer, nullable=False)
 
     genres = relationship(
+            "Genre",
             secondary=movie_genre_association_table,
             back_populates='dramas'
         )
 
     tags = relationship(
+            "Tag",
             secondary=movie_genre_association_table,
             back_populates='dramas'
         )
@@ -64,16 +66,18 @@ class Genre(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String, nullable=False)
     dramas = relationship(
+            "Drama",
             secondary=movie_genre_association_table,
             back_populates='genres'
     )
 
-class Tags(Base):
+class Tag(Base):
     __tablename__ = 'tags'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String, nullable=False)
     dramas = relationship(
+            "Drama",
             secondary=movie_genre_association_table,
             back_populates='tags'
     )

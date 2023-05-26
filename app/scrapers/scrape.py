@@ -7,28 +7,29 @@ import time
 import re
 from bs4 import BeautifulSoup
 
+class Options:
+    dramas: Optional[str] = "68"
+    drama_special: Optional[str] = "83"
+    movies: Optional[str] = "77"
+    tv_shows: Optional[str] = "86"
+
+    def __init__(
+            self, 
+            dramas: bool = False,
+            drama_special: bool = False,
+            movies: bool = False,
+            tv_shows: bool = False,
+         ):
+        if not dramas: self.DRAMAS = None
+        if not drama_special: self.DRAMA_SPECIAL = None
+        if not movies: self.MOVIES = None
+        if not tv_shows: self.TV_SHOWS = None
+        self.any: bool = any([dramas, drama_special, movies, tv_shows])
+
 class IDScraper:
     BASE_URL = "https://mydramalist.com"
     START_YEAR = 2000
     END_YEAR = 2023
-    class Options:
-        dramas: Optional[str] = "68"
-        drama_special: Optional[str] = "83"
-        movies: Optional[str] = "77"
-        tv_shows: Optional[str] = "86"
-
-        def __init__(
-                self, 
-                dramas: bool = False,
-                drama_special: bool = False,
-                movies: bool = False,
-                tv_shows: bool = False,
-             ):
-            if not dramas: self.DRAMAS = None
-            if not drama_special: self.DRAMA_SPECIAL = None
-            if not movies: self.MOVIES = None
-            if not tv_shows: self.TV_SHOWS = None
-            self.any: bool = any([dramas, drama_special, movies, tv_shows])
 
     def __init__(self, force_refresh_cache: bool = False):
         self.cache_fname = os.path.join(".cache", "id_cache.json")

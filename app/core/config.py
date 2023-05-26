@@ -6,3 +6,5 @@ class Settings(BaseSettings):
     APP_DB: str
 
 settings = Settings()
+
+TESTING = True

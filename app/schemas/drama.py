@@ -8,23 +8,23 @@ class DramaBase(BaseModel):
     title: str
     year: str
     type: str
-    description: Optional[str]
+    description: Optional[str] = None
     rating: float
     ratings: int
     watchers: int
     reviews: int
-    native_title: Optional[str]
-    known_as: Optional[List[str]]
-    screenwriter: Optional[str]
-    director: Optional[str]
+    native_title: Optional[str] = None
+    known_as: Optional[List[str]] = None
+    screenwriter: Optional[str] = None
+    director: Optional[str] = None
     country: str
-    episodes: Optional[int]
-    aired: Optional[str]
-    aired_on: Optional[str]
-    release_date: Optional[str]
-    duration: Optional[str]
-    original_network: Optional[str]
-    content_rating: Optional[str]
+    episodes: Optional[int] = None
+    aired: Optional[str] = None
+    aired_on: Optional[str] = None
+    release_date: Optional[str] = None
+    duration: Optional[str] = None
+    original_network: Optional[str] = None
+    content_rating: Optional[str] = None
     ranked: int
     popularity: int
 

@@ -2,22 +2,13 @@ from typing import Any, Dict, List, Optional, Set, Tuple, Type
 
 import requests
 import os
-import json
-import time
 import re
 from bs4 import BeautifulSoup
 
+from app.models.drama import Drama, Genre, Tag
+
 class DramaParser:
     BASE_URL = "https://mydramalist.com"
-
-    def __init__(self, id: str):
-        self.id = id
-        r = requests.get(self.BASE_URL + "/" + id)
-        soup = BeautifulSoup(r.content, "html.parser")
-        path = os.path.join('.cache', 'drama.html')
-        with open(path, 'w') as f:
-            f.write(soup.prettify())
-        self.soup = soup
 
     def __element_parser(
             self,
@@ -34,7 +25,17 @@ class DramaParser:
                 return text
         return None
 
-    def parse_model(self) -> dict:
+    def scrape(self, id: str):
+        self.id = id
+        r = requests.get(self.BASE_URL + "/" + id)
+
+        self.soup = BeautifulSoup(r.content, "html.parser")
+
+        path = os.path.join('.cache', 'drama.html')
+        with open(path, 'w') as f:
+            f.write(self.soup.prettify())
+
+    def parse_models(self) -> Tuple[Drama, List[Genre], List[Tag]]:
         short_id = self.id[:self.id.find('-')]
         full_id = self.id
         title, year = self.parse_title_year()
@@ -48,8 +49,8 @@ class DramaParser:
         genres = self.parse_genres()
         tags = self.parse_tags()
 
-        genre_list = [{"title":x} for x in genres]
-        tag_list = [{"title":x} for x in tags]
+        genres = [Genre(title=x) for x in genres]
+        tags = [Tag(title=x) for x in tags]
 
         model_dict = {
                 "short_id": short_id,
@@ -77,11 +78,13 @@ class DramaParser:
                 "content_rating": content_rating,
                 "ranked": ranked,
                 "popularity": popularity,
-                "genres": genre_list,
-                "tags": tag_list
         }
 
-        return model_dict
+        drama = Drama(**model_dict)
+        drama.genres = genres
+        drama.tags = tags
+
+        return drama, genres, tags
 
 
     def parse_title_year(self) -> Tuple[str, str]:

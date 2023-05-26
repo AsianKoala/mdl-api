@@ -1,8 +1,8 @@
-from scrapers.scrape import IDScraper
+from scrapers.scrape import IDScraper, Options
 from scrapers.parse import DramaParser
 
 scraper = IDScraper(force_refresh_cache=False)
-opts = IDScraper.Options(dramas=True)
+opts = Options(dramas=True)
 parser = DramaParser("1814-always")
 
 
