@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import drama
+from .routers import drama, genres, tags
 
 app = FastAPI()
 
@@ -20,6 +20,8 @@ app.add_middleware(
 )
 
 app.include_router(drama.router)
+app.include_router(genres.router)
+app.include_router(tags.router)
 
 @app.get('/')
 async def root():
