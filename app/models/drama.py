@@ -56,7 +56,7 @@ class Drama(Base):
 
     tags = relationship(
             "Tag",
-            secondary=movie_genre_association_table,
+            secondary=movie_tag_association_table,
             back_populates='dramas'
         )
 
@@ -78,7 +78,7 @@ class Tag(Base):
     title = Column(String, nullable=False)
     dramas = relationship(
             "Drama",
-            secondary=movie_genre_association_table,
+            secondary=movie_tag_association_table,
             back_populates='tags'
     )
 

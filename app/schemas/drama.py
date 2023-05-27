@@ -34,11 +34,17 @@ class DramaBase(BaseModel):
 class GenreBase(BaseModel):
     title: str
 
-class Genre(BaseModel):
-    dramas: List[DramaBase]
+    class Config:
+        orm_mode = True
 
 class TagBase(BaseModel):
     title: str
+
+    class Config:
+        orm_mode = True
+
+class Genre(BaseModel):
+    dramas: List[DramaBase]
 
 class Tag(TagBase):
     dramas: List[DramaBase]
@@ -46,3 +52,4 @@ class Tag(TagBase):
 class Drama(DramaBase):
     genres: List[GenreBase]
     tags: List[TagBase]
+

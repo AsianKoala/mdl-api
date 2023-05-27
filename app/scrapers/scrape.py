@@ -32,7 +32,7 @@ class IDScraper:
     END_YEAR = 2023
 
     def __init__(self, force_refresh_cache: bool = False):
-        self.cache_fname = os.path.join(".cache", "id_cache.json")
+        self.cache_fname = os.path.join("app", ".cache", "id_cache.json")
         if force_refresh_cache:
             self.__create_cache()
         self.id_set = self.__load_cache()

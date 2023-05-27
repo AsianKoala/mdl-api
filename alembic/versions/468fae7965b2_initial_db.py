@@ -1,8 +1,8 @@
-"""Added initial tables
+"""Initial db
 
-Revision ID: 7ad0d7708cf7
+Revision ID: 468fae7965b2
 Revises: 
-Create Date: 2023-05-26 12:04:20.158971
+Create Date: 2023-05-26 19:19:45.220109
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7ad0d7708cf7'
+revision = '468fae7965b2'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -31,18 +31,6 @@ def upgrade() -> None:
     sa.Column('watchers', sa.Integer(), nullable=False),
     sa.Column('reviews', sa.Integer(), nullable=False),
     sa.Column('native_title', sa.String(), nullable=True),
-    sa.Column('known_as', sa.ARRAY(sa.String()), nullable=True),
-    sa.Column('screenwriter', sa.String(), nullable=True),
-    sa.Column('director', sa.String(), nullable=True),
-    sa.Column('country', sa.String(), nullable=False),
-    sa.Column('episodes', sa.Integer(), nullable=True),
-    sa.Column('aired', sa.String(), nullable=True),
-    sa.Column('aired_on', sa.String(), nullable=True),
-    sa.Column('release_date', sa.String(), nullable=True),
-    sa.Column('duration', sa.String(), nullable=True),
-    sa.Column('original_network', sa.String(), nullable=True),
-    sa.Column('content_rating', sa.String(), nullable=True),
-    sa.Column('ranked', sa.Integer(), nullable=False),
     sa.Column('popularity', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )

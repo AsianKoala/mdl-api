@@ -31,7 +31,7 @@ class DramaParser:
 
         self.soup = BeautifulSoup(r.content, "html.parser")
 
-        path = os.path.join('.cache', 'drama.html')
+        path = os.path.join('app', '.cache', 'drama.html')
         with open(path, 'w') as f:
             f.write(self.soup.prettify())
 
