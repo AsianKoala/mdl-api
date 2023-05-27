@@ -9,15 +9,15 @@ class DramaBase(BaseModel):
     year: int
     type: str
     description: Optional[str] = None
-    rating: float
-    ratings: int
-    watchers: int
-    reviews: int
+    rating: Optional[float] = None
+    ratings: Optional[int] = None
+    watchers: Optional[int] = None
+    reviews: Optional[int] = None
     native_title: Optional[str] = None
     known_as: Optional[List[str]] = None
     screenwriter: Optional[str] = None
     director: Optional[str] = None
-    country: str
+    country: Optional[str] = None
     episodes: Optional[int] = None
     aired: Optional[str] = None
     aired_on: Optional[str] = None
@@ -25,8 +25,8 @@ class DramaBase(BaseModel):
     duration: Optional[str] = None
     original_network: Optional[str] = None
     content_rating: Optional[str] = None
-    ranked: int
-    popularity: int
+    ranked: Optional[int] = None
+    popularity: Optional[int] = None
 
     class Config:
         orm_mode = True
@@ -43,7 +43,7 @@ class TagBase(BaseModel):
     class Config:
         orm_mode = True
 
-class Genre(BaseModel):
+class Genre(GenreBase):
     dramas: List[DramaBase]
 
 class Tag(TagBase):

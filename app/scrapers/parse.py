@@ -28,12 +28,7 @@ class DramaParser:
     def scrape(self, id: str):
         self.id = id
         r = requests.get(self.BASE_URL + "/" + id)
-
         self.soup = BeautifulSoup(r.content, "html.parser")
-
-        path = os.path.join('app', '.cache', 'drama.html')
-        with open(path, 'w') as f:
-            f.write(self.soup.prettify())
 
     def parse_models(self) -> Tuple[Drama, List[Genre], List[Tag]]:
         short_id = self.id[:self.id.find('-')]
@@ -103,16 +98,30 @@ class DramaParser:
             return None
 
     def parse_user_info(self) -> Tuple:
-        elements = self.soup.find_all('div', attrs={'class':'hfs'})
-        all_text = ""
-        for element in elements: all_text += element.text.strip()
-        pattern = r".*: (.*)\/.* from (.*) users.*: (.*)Reviews: (.*) users"
-        p = re.compile(pattern)
-        m = re.search(p, all_text)
+        try:
+            elements = self.soup.find_all('div', attrs={'class':'hfs'})
+            all_text = ""
+            for element in elements: all_text += element.text.strip()
+            pattern = r".*: (.*)\/.* from (.*) users.*: (.*)Reviews: (.*) users"
+            p = re.compile(pattern)
+            m = re.search(p, all_text)
 
-        def clean_str(s): return s.replace(',', '')
+            def clean_str(s): return s.replace(',', '')
 
-        return float(m.group(1)), int(clean_str(m.group(2))), int(clean_str(m.group(3))), int(clean_str(m.group(4)))
+            def safe_cast(a, b):
+                try:
+                    return a(b)
+                except:
+                    return None
+
+            return safe_cast(float, m.group(1)),\
+                    safe_cast(int, clean_str(m.group(2))),\
+                    safe_cast(int, clean_str(m.group(3))),\
+                    safe_cast(int, clean_str(m.group(4)))
+        except:
+            with open(os.path.join('app', '.cache', 'error.html'), 'w') as f:
+                f.write(self.soup.prettify())
+            raise Exception("shit got fucked")
 
 
     def parse_native_title(self) -> Optional[str]:
