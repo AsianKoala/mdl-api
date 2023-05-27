@@ -19,8 +19,8 @@ def init_test_data():
 
 def test_db_data():
     db = SessionLocal()
-    d = db.query(Drama).first()
-    s = schemas.Drama.from_orm(d)
+    d = db.query(Tag).first()
+    s = schemas.Tag.from_orm(d)
     print(s.json())
     # print(s.json())
 

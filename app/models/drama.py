@@ -1,3 +1,4 @@
+from enum import unique
 from sqlalchemy import ARRAY, TIMESTAMP, UUID, Boolean, Column, Date, Float, ForeignKey, Integer, String, Table, text
 from sqlalchemy.orm import relationship
 
@@ -23,7 +24,7 @@ class Drama(Base):
     __tablename__ = 'dramas'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    short_id = Column(String, nullable=False)
+    short_id = Column(Integer, nullable=False, unique=True)
     full_id = Column(String, nullable=False)
     title = Column(String, nullable=False)
     year = Column(Integer, nullable=False)
@@ -64,7 +65,7 @@ class Genre(Base):
     __tablename__ = 'genres'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    title = Column(String, nullable=False)
+    title = Column(String, nullable=False, unique=True)
     dramas = relationship(
             "Drama",
             secondary=movie_genre_association_table,
@@ -75,7 +76,7 @@ class Tag(Base):
     __tablename__ = 'tags'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    title = Column(String, nullable=False)
+    title = Column(String, nullable=False, unique=True)
     dramas = relationship(
             "Drama",
             secondary=movie_tag_association_table,

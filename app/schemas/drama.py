@@ -3,10 +3,10 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 class DramaBase(BaseModel):
-    short_id: str
+    short_id: int
     full_id: str
     title: str
-    year: str
+    year: int
     type: str
     description: Optional[str] = None
     rating: float
