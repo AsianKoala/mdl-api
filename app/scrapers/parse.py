@@ -30,7 +30,7 @@ class DramaParser:
         r = requests.get(self.BASE_URL + "/" + id)
         self.soup = BeautifulSoup(r.content, "html.parser")
 
-    def parse_models(self) -> Tuple[Drama, List[Genre], List[Tag]]:
+    def parse_model(self) -> Drama:
         short_id = self.id[:self.id.find('-')]
         full_id = self.id
         title, year = self.parse_title_year()
@@ -76,8 +76,10 @@ class DramaParser:
         }
 
         drama = Drama(**model_dict)
+        drama.genres = genres
+        drama.tags = tags
 
-        return drama, genres, tags
+        return drama
 
 
     def parse_title_year(self) -> Tuple[str, str]:

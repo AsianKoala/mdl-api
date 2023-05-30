@@ -4,10 +4,11 @@ from sqlalchemy import Boolean, func, literal_column
 from sqlalchemy.orm import Session
 from app import schemas
 from app.database import SessionLocal
-from app.models.drama import Drama, DramaTag, Genre, Tag
+from app.models.drama import Drama, Genre, Tag
 from app.scrapers.parse import DramaParser
 from app.scrapers.scrape import IDScraper, Options
 from app.db.base import Base
+from app.db.crud.drama import CRUDDrama
 from routers import genres
 import database
 
@@ -72,9 +73,26 @@ def add_drama(db: Session,
                 db.add(clean_t[i])
                 db.commit()
 
+def test_update():
+    db = SessionLocal()
+    crud = CRUDDrama()
+    update_data = {'title': 'muahmuah'}
+    id = '35729'
+    crud.update_drama(db, id, update_data)
+
+def init_data():
+    ids = [one, two, three]
+    db = SessionLocal()
+    crud = CRUDDrama()
+    parser = DramaParser()
+    for id in ids:
+        parser.scrape(id)
+        drama = parser.parse_model()
+        crud.create_drama(db, drama)
+
 def main():
-    # delete_data()
-    pass
+    test_update()
+    # init_data()
     
 
 if __name__ == "__main__":

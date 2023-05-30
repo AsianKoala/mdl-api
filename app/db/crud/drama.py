@@ -1,12 +1,12 @@
 from typing import Any, Dict, List, Optional, Tuple
 from fastapi.encoders import jsonable_encoder
-from models.drama import Drama, Genre, Tag
+from app.models.drama import Drama, Genre, Tag
 import schemas
 from sqlalchemy.orm import Session
 
-ATTR_UNION = Tag | Genre
 
 class CRUDDrama:
+    ATTR_UNION = Tag | Genre
 
     def get_drama_by_title(self, db: Session, title: str) -> Optional[Drama]:
         return db.query(Drama).filter(Drama.title == title).first()
@@ -60,7 +60,7 @@ class CRUDDrama:
 
     def create_drama(self, db: Session, drama: Drama) -> Drama:
         # check if drama already exists
-        drama = schemas.Drama.validate(drama)
+        schemas.Drama.validate(drama)
         query = db.query(Drama).filter(Drama.title == drama.title)
         if query.count() != 0:
             print(f"Drama {drama.title} already exists within database")
@@ -82,23 +82,27 @@ class CRUDDrama:
     def update_drama(
             self,
             db: Session,
-            drama: Drama,
+            short_id: int,
             in_data: Drama | Dict[str, Any]
             ) -> Optional[Drama]:
-        drama = schemas.Drama.validate(drama)
-
         # verify drama exists within the database
-        query = db.query(Drama).filter(Drama.title == drama.title)
+        query = db.query(Drama).filter(Drama.short_id == short_id)
         if query.count() == 0:
-            print(f"Drama {drama.title} not found in the database")
+            print(f"Drama id={short_id} not found in the database")
             return None
 
-        if in_data is dict:
+
+        if isinstance(in_data, dict):
             update_data = in_data
         else:
             update_data = in_data.__dict__
 
-        query.update(**update_data, synchronize_session=False)
+        db_obj = query.first()
+        data = db_obj.__dict__
+        for attr in data:
+            if attr in update_data:
+                setattr(db_obj, attr, update_data[attr])
+
         db.commit()
 
     def delete_drama(self, db: Session, short_id: int) -> Optional[Drama]:
@@ -110,5 +114,4 @@ class CRUDDrama:
         db.delete(obj)
         db.commit()
         return obj
-
 
