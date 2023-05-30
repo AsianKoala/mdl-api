@@ -8,8 +8,8 @@ from sqlalchemy.orm import Session
 class CRUDDrama:
     ATTR_UNION = Tag | Genre
 
-    def get_drama_by_title(self, db: Session, title: str) -> Optional[Drama]:
-        return db.query(Drama).filter(Drama.title == title).first()
+    def get_dramas_by_title(self, db: Session, title: str) -> List[Drama]:
+        return db.query(Drama).filter(Drama.title.ilike(f"%{title}%")).all()
 
     def get_drama_by_id(self, db: Session, id: int) -> Optional[Drama]:
         return db.query(Drama).filter(Drama.short_id == id).first()
