@@ -15,3 +15,4 @@ async def get_tags(db: Session = Depends(get_db), limit: int = 10, skip: int = 0
     if search: query = query.filter(Tag.title.ilike(f"%{search}%"))
     query = query.offset(skip).limit(limit).all()
     return query
+

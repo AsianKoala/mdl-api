@@ -76,8 +76,6 @@ class DramaParser:
         }
 
         drama = Drama(**model_dict)
-        drama.genres = genres
-        drama.tags = tags
 
         return drama, genres, tags
 

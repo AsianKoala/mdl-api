@@ -1,0 +1,3 @@
+- migrate db from UUID to short_id
+- add schemas to CRUD
+- move parser away from using models

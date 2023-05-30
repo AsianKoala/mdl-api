@@ -10,7 +10,7 @@ from app.models.drama import Genre
 router = APIRouter(prefix='/genres', tags=['Genres'])
 
 @router.get('/', response_model=List[schemas.GenreBase])
-async def get_genres(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: Optional[str] = None):
+def get_genres(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: Optional[str] = None):
     query = db.query(Genre)
     if search: query = query.filter(Genre.title.ilike(f"%{search}%"))
     query = query.offset(skip).limit(limit).all()

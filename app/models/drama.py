@@ -1,4 +1,3 @@
-from enum import unique
 from sqlalchemy import ARRAY, TIMESTAMP, UUID, Boolean, Column, Date, Float, ForeignKey, Integer, String, Table, text
 from sqlalchemy.orm import relationship
 
@@ -6,19 +5,17 @@ import uuid
 
 from app.db.base_class import Base
 
-movie_genre_association_table = Table(
-        "movie_genres",
-        Base.metadata,
-        Column('drama_id', ForeignKey('dramas.id'), primary_key=True),
-        Column('genre_id', ForeignKey('genres.id'), primary_key=True)
-)
+class DramaGenre(Base):
+    __tablename__ = 'drama_genre'
 
-movie_tag_association_table = Table(
-        "movie_tags",
-        Base.metadata,
-        Column('drama_id', ForeignKey('dramas.id'), primary_key=True),
-        Column('tag_id', ForeignKey('tags.id'), primary_key=True)
-)
+    drama_id = Column(UUID(as_uuid=True), ForeignKey('dramas.id'), primary_key=True)
+    genre_id = Column(UUID(as_uuid=True), ForeignKey('genres.id'), primary_key=True)
+
+class DramaTag(Base):
+    __tablename__ = 'drama_tag'
+
+    drama_id = Column(UUID(as_uuid=True), ForeignKey('dramas.id'), primary_key=True)
+    tag_id = Column(UUID(as_uuid=True), ForeignKey('tags.id'), primary_key=True)
 
 class Drama(Base):
     __tablename__ = 'dramas'
@@ -49,38 +46,20 @@ class Drama(Base):
     ranked = Column(Integer, nullable=True)
     popularity = Column(Integer, nullable=True)
 
-    genres = relationship(
-            "Genre",
-            secondary=movie_genre_association_table,
-            back_populates='dramas'
-        )
-
-    tags = relationship(
-            "Tag",
-            secondary=movie_tag_association_table,
-            back_populates='dramas'
-        )
+    genres = relationship("Genre", secondary="drama_genre", back_populates='drama')
+    tags = relationship("Tag", secondary="drama_tag", back_populates='drama')
 
 class Genre(Base):
     __tablename__ = 'genres'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    title = Column(String, nullable=False, unique=True)
-    dramas = relationship(
-            "Drama",
-            secondary=movie_genre_association_table,
-            back_populates='genres'
-    )
+    title = Column(String, nullable=False)
+    drama = relationship("Drama", secondary="drama_genre", back_populates='genres')
 
 class Tag(Base):
     __tablename__ = 'tags'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    title = Column(String, nullable=False, unique=True)
-    dramas = relationship(
-            "Drama",
-            secondary=movie_tag_association_table,
-            back_populates='tags'
-    )
-
+    title = Column(String, nullable=False)
+    drama = relationship("Drama", secondary="drama_tag", back_populates='tags')
 

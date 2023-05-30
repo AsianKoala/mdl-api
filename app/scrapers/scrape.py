@@ -135,7 +135,6 @@ class IDScraper:
 
         r = requests.get(url)
         soup = BeautifulSoup(r.content, "html.parser")
-        path = os.path.join('.cache', 'test.html')
         link_elements = soup.find_all("a", attrs={"class": "block"})
         year_elements = soup.find_all("span", attrs={"class": "text-muted"})
 
