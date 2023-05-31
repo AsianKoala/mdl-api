@@ -1,24 +1,20 @@
+from typing import List, Optional
+
+from sqlalchemy.orm import Session
+
 from app.models.drama import Tag
 
-
 class CRUDTag:
-    ATTR_UNION = Tag | Tag
+    def get_tags(
+        self, db: Session, offset: int = 0, limit: int = 0, search: Optional[str] = None
+    ) -> List[Tag]:
+        query = db.query(Tag)
+        if search:
+            query = query.filter(Tag.title.ilike(f"%{search}%"))
+        query = query.offset(offset).limit(limit).all()
+        return query
 
-    # def get_tags(
-    #         self,
-    #         db: Session,
-    #         offset: int = 0,
-    #         limit: int = 0,
-    #         search: Optional[str] = None
-    #         ) -> List[TagBase]:
-    #     query = db.query(Tag)
-    #     if search:
-    #         query = query.filter(Tag.title.ilike(f"%{search}%"))
-    #     query = query.offset(offset).limit(limit).all()
-    #     return query
-    #
-    # def get_tag(
-    #         self,
-    #         db: Session,
-    #         title: str
-    #         )
+    def get_tag(self, db: Session, id: int) -> Optional[Tag]:
+        query = db.query(Tag).filter(Tag.id == id).first()
+        return query
+

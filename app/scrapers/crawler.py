@@ -1,6 +1,7 @@
 import re
 import time
 from typing import Optional
+from core.util import retry_request
 
 import requests
 from bs4 import BeautifulSoup
@@ -26,8 +27,12 @@ class CrawlerOptions:
         movies: bool = False,
         tv_shows: bool = False,
         sleep_time: float = 1.0,
+        default_retry_time: float = 60.0,
+        max_retries: int = 10
     ):
         self.sleep_time = sleep_time
+        self.default_retry_time = default_retry_time
+        self.max_retries = max_retries
         any_params: bool = any([dramas, drama_special, movies, tv_shows])
 
         url = ""
@@ -79,7 +84,12 @@ class IDCrawler:
             time.sleep(self.opts.sleep_time)
 
             url = self.__build_search_url(year, page)
-            scraped = self.parse_page(url)
+            try:
+                scraped = self.parse_page(url)
+            except:
+                logger.error("Error during parsing page %s", page)
+                scraped = False
+
             if not scraped:
                 logger.info("Finished crawling at page: %s", page)
                 logger.info("Skipping %s pages", page_end - page)
@@ -93,7 +103,9 @@ class IDCrawler:
     def parse_page(self, url: str) -> Boolean:
         year_q = self.__extract_year_query(url)
 
-        r = requests.get(url)
+        # r = requests.get(url)
+        r = retry_request(url, self.opts.default_retry_time, self.opts.max_retries, logger)
+
         soup = BeautifulSoup(r.content, "html.parser")
         link_elements = soup.find_all("a", attrs={"class": "block"})
         year_elements = soup.find_all("span", attrs={"class": "text-muted"})

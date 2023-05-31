@@ -1,4 +1,5 @@
 from typing import List
+from app.core.log import generate_logger
 
 import database
 from sqlalchemy.orm import Session
@@ -14,6 +15,7 @@ one = "35729-emergency-lands-of-love"
 two = "49865-psycho-but-it-s-okay"
 three = "32925-hotel-del-luna"
 
+logger = generate_logger()
 
 def delete_data():
     Base.metadata.drop_all(bind=database.engine)
@@ -109,13 +111,13 @@ def populate_id_cache():
 
 def test_logger():
     pass
-    # logging.info("test")
+    logger.info("test")
 
 
 def main():
-    populate_id_cache()
-    # test_logger()
-
+    # populate_id_cache()
+    test_logger()
+    # init_data()
 
 if __name__ == "__main__":
     main()

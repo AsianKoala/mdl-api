@@ -34,6 +34,7 @@ class DramaBase(BaseModel):
 
 
 class GenreBase(BaseModel):
+    id: int
     title: str
 
     class Config:
@@ -41,6 +42,7 @@ class GenreBase(BaseModel):
 
 
 class TagBase(BaseModel):
+    id: int
     title: str
 
     class Config:
