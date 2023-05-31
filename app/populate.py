@@ -1,24 +1,24 @@
 from typing import List
-from sqlalchemy import Boolean, func, literal_column
 
+import database
 from sqlalchemy.orm import Session
-from app import schemas
+
 from app.database import SessionLocal
-from app.models.drama import Drama, Genre, Tag
-from app.scrapers.parse import DramaParser
-from app.scrapers.scrape import IDScraper, Options
 from app.db.base import Base
 from app.db.crud.drama import CRUDDrama
-from routers import genres
-import database
+from app.models.drama import Drama, Genre, Tag
+from app.scrapers.crawler import CrawlerOptions, IDCrawler
+from app.scrapers.parse import DramaParser
 
 one = "35729-emergency-lands-of-love"
 two = "49865-psycho-but-it-s-okay"
 three = "32925-hotel-del-luna"
 
+
 def delete_data():
     Base.metadata.drop_all(bind=database.engine)
     Base.metadata.create_all(bind=database.engine)
+
 
 def clean_genres(db: Session, genres: List[Genre]):
     genre_list = []
@@ -51,49 +51,71 @@ def clean_tags(db: Session, tags: List[Tag]):
         add_to_db_list.append(add_to_db)
     return tag_list, add_to_db_list
 
-def add_drama(db: Session,
-              drama: Drama,
-              genres: List[Genre],
-              tags: List[Tag]):
-        clean_g, add_g = clean_genres(db, genres)
-        clean_t, add_t = clean_tags(db, tags)
-        drama.genres = clean_g
-        drama.tags = clean_t
 
-        db.add(drama)
-        db.commit()
+def add_drama(db: Session, drama: Drama, genres: List[Genre], tags: List[Tag]):
+    clean_g, add_g = clean_genres(db, genres)
+    clean_t, add_t = clean_tags(db, tags)
+    drama.genres = clean_g
+    drama.tags = clean_t
 
-        for i, add in enumerate(add_g):
-            if add:
-                db.add(clean_g[i])
-                db.commit()
+    db.add(drama)
+    db.commit()
 
-        for i, add in enumerate(add_t):
-            if add:
-                db.add(clean_t[i])
-                db.commit()
+    for i, add in enumerate(add_g):
+        if add:
+            db.add(clean_g[i])
+            db.commit()
+
+    for i, add in enumerate(add_t):
+        if add:
+            db.add(clean_t[i])
+            db.commit()
+
 
 def test_update():
     db = SessionLocal()
     crud = CRUDDrama()
-    update_data = {'title': 'muahmuah'}
-    id = '35729'
+    update_data = {"title": "xd"}
+    id = "35729"
     crud.update_drama(db, id, update_data)
 
+
+def test_delete():
+    db = SessionLocal()
+    crud = CRUDDrama()
+    ids = list(map(lambda x: x[: x.find("-")], [one, two, three]))
+    for id in ids:
+        crud.delete_drama(db, id)
+
+
 def init_data():
-    ids = [one, two, three]
     db = SessionLocal()
     crud = CRUDDrama()
     parser = DramaParser()
+    ids = [one, two, three]
     for id in ids:
         parser.scrape(id)
         drama = parser.parse_model()
         crud.create_drama(db, drama)
 
+
+def populate_id_cache():
+    db = SessionLocal()
+    options = CrawlerOptions(dramas=True)
+    crawler = IDCrawler(db, options)
+    crawler.crawl_year(2020, page_start=1, page_end=2)
+    # crawler.write_db()
+
+
+def test_logger():
+    pass
+    # logging.info("test")
+
+
 def main():
-    test_update()
-    # init_data()
-    
+    populate_id_cache()
+    # test_logger()
+
 
 if __name__ == "__main__":
     main()

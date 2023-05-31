@@ -1,27 +1,30 @@
-from sqlalchemy import ARRAY, UUID, Column, Float, ForeignKey, Integer, String
+from sqlalchemy import ARRAY, Column, DateTime, Float, ForeignKey, Integer, String, func
 from sqlalchemy.orm import relationship
-
-import uuid
 
 from app.db.base_class import Base
 
-class DramaGenre(Base):
-    __tablename__ = 'drama_genre'
 
-    drama_id = Column(UUID(as_uuid=True), ForeignKey('dramas.id'), primary_key=True)
-    genre_id = Column(UUID(as_uuid=True), ForeignKey('genres.id'), primary_key=True)
+class DramaGenre(Base):
+    __tablename__ = "drama_genre"
+
+    drama_id = Column(Integer, ForeignKey("dramas.id"), primary_key=True)
+    genre_id = Column(Integer, ForeignKey("genres.id"), primary_key=True)
+
 
 class DramaTag(Base):
-    __tablename__ = 'drama_tag'
+    __tablename__ = "drama_tag"
 
-    drama_id = Column(UUID(as_uuid=True), ForeignKey('dramas.id'), primary_key=True)
-    tag_id = Column(UUID(as_uuid=True), ForeignKey('tags.id'), primary_key=True)
+    drama_id = Column(Integer, ForeignKey("dramas.id"), primary_key=True)
+    tag_id = Column(Integer, ForeignKey("tags.id"), primary_key=True)
+
 
 class Drama(Base):
-    __tablename__ = 'dramas'
+    __tablename__ = "dramas"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    short_id = Column(Integer, nullable=False, unique=True)
+    id = Column(Integer, primary_key=True)
+    parse_date = Column(
+        DateTime(timezone=True), onupdate=func.now(), server_default=func.now()
+    )
     full_id = Column(String, nullable=False)
     title = Column(String, nullable=False)
     year = Column(Integer, nullable=False)
@@ -46,20 +49,28 @@ class Drama(Base):
     ranked = Column(Integer, nullable=True)
     popularity = Column(Integer, nullable=True)
 
-    genres = relationship("Genre", secondary="drama_genre", back_populates='drama')
-    tags = relationship("Tag", secondary="drama_tag", back_populates='drama')
+    genres = relationship("Genre", secondary="drama_genre", back_populates="drama")
+    tags = relationship("Tag", secondary="drama_tag", back_populates="drama")
+
 
 class Genre(Base):
-    __tablename__ = 'genres'
+    __tablename__ = "genres"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
-    drama = relationship("Drama", secondary="drama_genre", back_populates='genres')
+    drama = relationship("Drama", secondary="drama_genre", back_populates="genres")
+
 
 class Tag(Base):
-    __tablename__ = 'tags'
+    __tablename__ = "tags"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
-    drama = relationship("Drama", secondary="drama_tag", back_populates='tags')
+    drama = relationship("Drama", secondary="drama_tag", back_populates="tags")
 
+
+class IDCache(Base):
+    __tablename__ = "idcache"
+
+    id = Column(Integer, primary_key=True, unique=True)
+    long_id = Column(String, nullable=False)

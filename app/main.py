@@ -1,21 +1,25 @@
+from core.log import generate_logger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .routers import drama, genres, tags
+
+logger = generate_logger()
+logger.info("Starting API")
 
 app = FastAPI()
 
 origins = [
     # "http://localhost",
     # "http://localhost:8080",
-    '*'
+    "*"
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET"],
     allow_headers=["*"],
 )
 
@@ -23,6 +27,7 @@ app.include_router(drama.router)
 app.include_router(genres.router)
 app.include_router(tags.router)
 
-@app.get('/')
+
+@app.get("/")
 async def root():
-    return {'message': 'xd'}
+    return {"message": "wsg"}

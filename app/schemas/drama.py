@@ -1,9 +1,10 @@
-from datetime import datetime
 from typing import List, Optional
+
 from pydantic import BaseModel
 
+
 class DramaBase(BaseModel):
-    short_id: int
+    id: int
     full_id: str
     title: str
     year: int
@@ -31,11 +32,13 @@ class DramaBase(BaseModel):
     class Config:
         orm_mode = True
 
+
 class GenreBase(BaseModel):
     title: str
 
     class Config:
         orm_mode = True
+
 
 class TagBase(BaseModel):
     title: str
@@ -43,13 +46,15 @@ class TagBase(BaseModel):
     class Config:
         orm_mode = True
 
+
 class Genre(GenreBase):
     dramas: List[DramaBase]
+
 
 class Tag(TagBase):
     dramas: List[DramaBase]
 
+
 class Drama(DramaBase):
     genres: List[GenreBase]
     tags: List[TagBase]
-

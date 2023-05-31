@@ -1,1 +1,1 @@
-from .drama import Drama, Tag, Genre, DramaBase, GenreBase, TagBase
+from .drama import Drama, DramaBase, Genre, GenreBase, Tag, TagBase
