@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.drama import Drama, Genre, Tag
 
+
 class CRUDDrama:
     ATTR_UNION = Tag | Genre
 

@@ -4,6 +4,7 @@ from typing import Any, List, Optional, Tuple, Type
 
 import requests
 from bs4 import BeautifulSoup
+from sqlalchemy import Boolean
 
 from app.models.drama import Drama, Genre, Tag
 
@@ -27,10 +28,13 @@ class DramaParser:
                 return text
         return None
 
-    def scrape(self, id: str):
+    def scrape(self, id: str) -> Boolean:
         self.id = id
         r = requests.get(self.BASE_URL + "/" + id)
+        if r.status_code == 404:
+            return False
         self.soup = BeautifulSoup(r.content, "html.parser")
+        return True
 
     def parse_model(self) -> Drama:
         id = self.id[: self.id.find("-")]

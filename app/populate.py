@@ -1,9 +1,10 @@
 from typing import List
-from app.core.log import generate_logger
 
 import database
+import requests
 from sqlalchemy.orm import Session
 
+from app.core.log import generate_logger
 from app.database import SessionLocal
 from app.db.base import Base
 from app.db.crud.drama import CRUDDrama
@@ -16,6 +17,7 @@ two = "49865-psycho-but-it-s-okay"
 three = "32925-hotel-del-luna"
 
 logger = generate_logger()
+
 
 def delete_data():
     Base.metadata.drop_all(bind=database.engine)
@@ -110,14 +112,19 @@ def populate_id_cache():
 
 
 def test_logger():
-    pass
     logger.info("test")
 
+def test_404():
+    url = "https://mydramalist.com/12345678"
+    r = requests.get(url)
+    print(r.status_code)
 
 def main():
     # populate_id_cache()
-    test_logger()
+    # test_logger()
     # init_data()
+    test_404()
+
 
 if __name__ == "__main__":
     main()

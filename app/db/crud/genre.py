@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.models.drama import Genre
 
+
 class CRUDGenre:
     def get_genres(
         self, db: Session, offset: int = 0, limit: int = 0, search: Optional[str] = None

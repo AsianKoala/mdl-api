@@ -1,6 +1,7 @@
 from core.log import generate_logger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from middleware import FlattenQueryStringListMiddleware
 
 from .routers import drama, genres, tags
 
@@ -9,11 +10,7 @@ logger.info("Starting API")
 
 app = FastAPI()
 
-origins = [
-    # "http://localhost",
-    # "http://localhost:8080",
-    "*"
-]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,6 +19,8 @@ app.add_middleware(
     allow_methods=["GET"],
     allow_headers=["*"],
 )
+
+app.add_middleware(FlattenQueryStringListMiddleware)
 
 app.include_router(drama.router)
 app.include_router(genres.router)

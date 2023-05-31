@@ -1,11 +1,10 @@
 import re
 import time
 from typing import Optional
-from core.util import retry_request
 
-import requests
 from bs4 import BeautifulSoup
 from core.log import generate_logger
+from core.util import retry_request
 from sqlalchemy import Boolean
 from sqlalchemy.orm import Session
 
@@ -28,7 +27,7 @@ class CrawlerOptions:
         tv_shows: bool = False,
         sleep_time: float = 1.0,
         default_retry_time: float = 60.0,
-        max_retries: int = 10
+        max_retries: int = 10,
     ):
         self.sleep_time = sleep_time
         self.default_retry_time = default_retry_time
@@ -104,7 +103,9 @@ class IDCrawler:
         year_q = self.__extract_year_query(url)
 
         # r = requests.get(url)
-        r = retry_request(url, self.opts.default_retry_time, self.opts.max_retries, logger)
+        r = retry_request(
+            url, self.opts.default_retry_time, self.opts.max_retries, logger
+        )
 
         soup = BeautifulSoup(r.content, "html.parser")
         link_elements = soup.find_all("a", attrs={"class": "block"})

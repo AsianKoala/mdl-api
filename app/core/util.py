@@ -1,17 +1,24 @@
+import time
 from logging import Logger
 from typing import Optional
-from core.log import generate_logger
-import requests
-import time
 
-def retry_request(url: str, default_retry_time: float, max_retries: int, logger: Logger = generate_logger()) -> Optional[requests.Response]:
+import requests
+from core.log import generate_logger
+
+
+def retry_request(
+    url: str,
+    default_retry_time: float,
+    max_retries: int,
+    logger: Logger = generate_logger(),
+) -> Optional[requests.Response]:
     r = requests.get(url)
     if r.status_code == 429:
         retry_counter = 0
         while r.status_code == 429:
             logger.warn("Too many requests sent. Retrying in 60 seconds")
             try:
-                retry_after = int(r.headers['retry-after'])
+                retry_after = int(r.headers["retry-after"])
             except:
                 retry_after = default_retry_time
             time.sleep(retry_after)
