@@ -116,44 +116,47 @@ def populate_id_cache():
 def test_logger():
     logger.info("test")
 
+
 def test_404():
     url = "https://mydramalist.com/12345678"
     r = requests.get(url)
     print(r.status_code)
 
+
 def test_sql():
-    db  = SessionLocal()
+    db = SessionLocal()
     genre_ids = [2]
     # q = db.query(Drama.id).filter(Drama.genres.any(Genre.id.in_(genre_ids))).all()
-    first = (
-        """
+    first = """
         SELECT dramas.* FROM dramas
         LEFT JOIN drama_genre 
-        ON dramas.id = drama_genre.drama_id AND drama_genre.genre_id IN ({})"""
-        .format(''.join(['{}, ']*(len(genre_ids)-1)) + str(genre_ids[len(genre_ids)-1]))
-        .format(*genre_ids)
+        ON dramas.id = drama_genre.drama_id AND drama_genre.genre_id IN ({})""".format(
+        "".join(["{}, "] * (len(genre_ids) - 1)) + str(genre_ids[len(genre_ids) - 1])
+    ).format(
+        *genre_ids
     )
 
-    second = (
-        """
+    second = """
         LEFT JOIN genres
         ON drama_genre.genre_id = genres.id
         GROUP BY dramas.id
-        HAVING COUNT(DISTINCT genres.title) = {}"""
-        .format(len(genre_ids))
+        HAVING COUNT(DISTINCT genres.title) = {}""".format(
+        len(genre_ids)
     )
 
     sql = text(first + second)
     rows = db.execute(sql)
-    models = [Drama(**r._asdict()) for r in rows]
+    [Drama(**r._asdict()) for r in rows]
+
 
 def test_build_sql():
-    genre_ids = [1,2]
-    tag_ids = [3,4]
+    genre_ids = [1, 2]
+    tag_ids = [3, 4]
     limit = 2
     offset = 3
     sql = build_sql(genre_ids, tag_ids, limit, offset)
     print(sql)
+
 
 def main():
     # populate_id_cache()
