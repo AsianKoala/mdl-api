@@ -123,7 +123,8 @@ def main():
     # populate_id_cache()
     # test_logger()
     # init_data()
-    test_404()
+    # test_404()
+    delete_data()
 
 
 if __name__ == "__main__":
