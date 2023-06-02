@@ -6,6 +6,7 @@ from db.crud.drama import CRUDDrama
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
 import requests
 from scrapers.parse import DramaParser
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.strategy_options import joinedload
 
@@ -58,6 +59,45 @@ def __fetch_drama(model: Optional[Drama], long_id: str, background_tasks: Backgr
             logger.error("Drama (id=%s) does not exist", long_id)
             return None
 
+def build_sql(genre_ids: Optional[List[int]], tag_ids: Optional[List[int]], search: Optional[str] = None, limit: Optional[int] = None, offset: Optional[int] = None) -> str:
+    select = "SELECT dramas.* FROM dramas"
+    if limit: limit_sql = "LIMIT {} ".format(limit)
+    else: limit_sql = "LIMIT ALL"
+    if offset: offset_sql = "OFFSET " + str(offset)
+    else: offset_sql = "OFFSET 0"
+
+    def __join_sql(x: str, ids: List[int]) -> str:
+        first = (
+            """
+            LEFT JOIN drama_{} 
+            ON dramas.id = drama_{}.drama_id AND drama_{}.{}_id IN ({})
+            """
+            .format(*([x]*4), ''.join(['{}, ']*(len(ids)-1)) + str(ids[len(ids)-1]))
+            .format(*ids)
+        )
+
+        second = (
+            """
+            LEFT JOIN {}s
+            ON drama_{}.{}_id = {}s.id
+            GROUP BY dramas.id
+            HAVING COUNT(DISTINCT {}s.title) = {}
+            """
+            .format(*([x]*6), len(ids))
+        )
+
+        return first + second
+
+    if genre_ids: genre_sql = __join_sql('genre', genre_ids)
+    else: genre_sql = ''
+    if tag_ids: tag_sql = __join_sql('tag', tag_ids)
+    else: tag_sql = ''
+
+    sql = select + genre_sql + tag_sql + limit_sql + offset_sql
+    return sql
+
+
+
 @router.get("/", response_model=List[schemas.Drama])
 async def get_dramas(
     db: Session = Depends(get_db),
@@ -66,17 +106,12 @@ async def get_dramas(
     limit: int = 10,
     skip: int = 0,
     search: Optional[str] = None
-):
-    query = db.query(Drama)
-    if search:
-        query = query.filter(Drama.title.ilike(f"%{search}%"))
-    query = (
-        query
-        .offset(skip)
-        .limit(limit)
-        .all()
-    )
-    return query
+) -> List[Drama]:
+    sql = text(build_sql(genres, tags, limit, skip))
+    rows = db.execute(sql)
+    models = [Drama(**r._asdict()) for r in rows]
+    return models
+
 
 @router.get("/{id}", response_model=schemas.Drama)
 async def get_drama(id: int, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):

@@ -2,6 +2,8 @@ from typing import List
 
 import database
 import requests
+from routers.drama import build_sql
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.core.log import generate_logger
@@ -119,12 +121,48 @@ def test_404():
     r = requests.get(url)
     print(r.status_code)
 
+def test_sql():
+    db  = SessionLocal()
+    genre_ids = [2]
+    # q = db.query(Drama.id).filter(Drama.genres.any(Genre.id.in_(genre_ids))).all()
+    first = (
+        """
+        SELECT dramas.* FROM dramas
+        LEFT JOIN drama_genre 
+        ON dramas.id = drama_genre.drama_id AND drama_genre.genre_id IN ({})"""
+        .format(''.join(['{}, ']*(len(genre_ids)-1)) + str(genre_ids[len(genre_ids)-1]))
+        .format(*genre_ids)
+    )
+
+    second = (
+        """
+        LEFT JOIN genres
+        ON drama_genre.genre_id = genres.id
+        GROUP BY dramas.id
+        HAVING COUNT(DISTINCT genres.title) = {}"""
+        .format(len(genre_ids))
+    )
+
+    sql = text(first + second)
+    rows = db.execute(sql)
+    models = [Drama(**r._asdict()) for r in rows]
+
+def test_build_sql():
+    genre_ids = [1,2]
+    tag_ids = [3,4]
+    limit = 2
+    offset = 3
+    sql = build_sql(genre_ids, tag_ids, limit, offset)
+    print(sql)
+
 def main():
     # populate_id_cache()
     # test_logger()
     # init_data()
     # test_404()
-    delete_data()
+    # delete_data()
+    # test_sql()
+    test_build_sql()
 
 
 if __name__ == "__main__":
