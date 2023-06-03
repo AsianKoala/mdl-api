@@ -155,8 +155,6 @@ def test_build_sql():
     limit = 2
     offset = 3
     sql = build_sql(genre_ids, tag_ids, limit, offset)
-    print(sql)
-
 
 def main():
     # populate_id_cache()

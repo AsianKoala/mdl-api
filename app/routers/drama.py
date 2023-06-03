@@ -70,12 +70,16 @@ def build_sql(
     offset: Optional[int] = None,
 ) -> str:
     select = "SELECT dramas.* FROM dramas"
+    if search:
+        search_sql = "WHERE dramas.title ILIKE {} ".format(search)
+    else:
+        search_sql = ""
     if limit:
         limit_sql = "LIMIT {} ".format(limit)
     else:
         limit_sql = "LIMIT ALL"
     if offset:
-        offset_sql = "OFFSET " + str(offset)
+        offset_sql = "OFFSET " + offset
     else:
         offset_sql = "OFFSET 0"
 
@@ -95,7 +99,7 @@ def build_sql(
             GROUP BY dramas.id
             HAVING COUNT(DISTINCT {}s.title) = {}
             """.format(
-            *([x] * 6), len(ids)
+            *([x] * 5), len(ids)
         )
 
         return first + second
@@ -109,7 +113,7 @@ def build_sql(
     else:
         tag_sql = ""
 
-    sql = select + genre_sql + tag_sql + limit_sql + offset_sql
+    sql = select + genre_sql + tag_sql + search_sql + limit_sql + offset_sql
     return sql
 
 
@@ -118,11 +122,11 @@ async def get_dramas(
     db: Session = Depends(get_db),
     genres: List[int] = Query(None),
     tags: List[int] = Query(None),
-    limit: int = 10,
-    skip: int = 0,
     search: Optional[str] = None,
+    limit: int = 10,
+    skip: int = 0
 ) -> List[Drama]:
-    sql = text(build_sql(genres, tags, limit, skip))
+    sql = text(build_sql(genres, tags, search, limit, skip))
     rows = db.execute(sql)
     models = [Drama(**r._asdict()) for r in rows]
     return models
