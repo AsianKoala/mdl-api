@@ -152,9 +152,11 @@ def test_sql():
 def test_build_sql():
     genre_ids = [1, 2]
     tag_ids = [3, 4]
-    limit = 2
-    offset = 3
-    sql = build_sql(genre_ids, tag_ids, limit, offset)
+    limit = ''
+    offset = ''
+    search = ""
+    sql = build_sql(genre_ids=genre_ids, tag_ids=tag_ids, limit=limit, offset=offset)
+    print(sql)
 
 def main():
     # populate_id_cache()
@@ -164,7 +166,6 @@ def main():
     # delete_data()
     # test_sql()
     test_build_sql()
-
 
 if __name__ == "__main__":
     main()

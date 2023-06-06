@@ -102,7 +102,7 @@ def build_sql(
             *([x] * 5), len(ids)
         )
 
-        return first + second
+        return select + first + second
 
     if genre_ids:
         genre_sql = __join_sql("genre", genre_ids)
@@ -113,7 +113,8 @@ def build_sql(
     else:
         tag_sql = ""
 
-    sql = select + genre_sql + tag_sql + search_sql + limit_sql + offset_sql
+    intersect = "INTERSECT\n"
+    sql = genre_sql + intersect + tag_sql + search_sql + limit_sql + offset_sql
     return sql
 
 
@@ -124,9 +125,9 @@ async def get_dramas(
     tags: List[int] = Query(None),
     search: Optional[str] = None,
     limit: int = 10,
-    skip: int = 0
+    offset: int = 0
 ) -> List[Drama]:
-    sql = text(build_sql(genres, tags, search, limit, skip))
+    sql = text(build_sql(genres, tags, search, limit, offset))
     rows = db.execute(sql)
     models = [Drama(**r._asdict()) for r in rows]
     return models
