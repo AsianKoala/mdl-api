@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from pydantic import BaseModel
+from schemas.user import UserBase
 
 
 class DramaBase(BaseModel):
@@ -60,3 +61,4 @@ class Tag(TagBase):
 class Drama(DramaBase):
     genres: List[GenreBase]
     tags: List[TagBase]
+    users: List[UserBase]

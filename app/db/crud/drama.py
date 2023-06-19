@@ -1,10 +1,13 @@
 from typing import Any, Dict, List, Optional, Tuple
+from core.log import generate_logger
+from fastapi.encoders import jsonable_encoder
 
 import schemas
 from sqlalchemy.orm import Session
 
 from app.models.drama import Drama, Genre, Tag
 
+logger = generate_logger()
 
 class CRUDDrama:
     ATTR_UNION = Tag | Genre
@@ -71,21 +74,24 @@ class CRUDDrama:
         # verify drama exists within the database
         obj = db.query(Drama).filter(Drama.id == short_id).first()
         if not obj:
-            print(f"Drama id={short_id} not found in the database")
             return None
 
+        data = jsonable_encoder(obj)
+
         if isinstance(in_data, dict):
-            update_data = in_data
+            data = jsonable_encoder(obj)
+            for attr in data:
+                if attr in in_data:
+                    setattr(obj, attr, in_data[attr])
+
+            db.commit()
+            db.refresh(obj)
+
+        # this case only happens when we update the drama from parse
         else:
-            update_data = in_data.__dict__
+            self.delete_drama(db, short_id)
+            obj = self.create_drama(db, in_data)
 
-        data = obj.__dict__
-        for attr in data:
-            if attr in update_data:
-                setattr(obj, attr, update_data[attr])
-
-        db.commit()
-        db.refresh(obj)
         return obj
 
     def delete_drama(self, db: Session, short_id: int) -> Optional[Drama]:

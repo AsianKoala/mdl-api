@@ -165,7 +165,8 @@ def main():
     # test_404()
     # delete_data()
     # test_sql()
-    test_build_sql()
+    # test_build_sql()
+    test_update()
 
 if __name__ == "__main__":
     main()
