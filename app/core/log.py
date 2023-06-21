@@ -37,9 +37,10 @@ class _CustomFormatter(logging.Formatter):
 def generate_logger(name: Optional[str] = None):
     if not name:
         caller_frame = inspect.stack()[1]
-        caller_filename_full = caller_frame.filename.split('/')
-        module = caller_filename_full[-2] + '.'
-        if module == 'app.': module = ''
+        caller_filename_full = caller_frame.filename.split("/")
+        module = caller_filename_full[-2] + "."
+        if module == "app.":
+            module = ""
         name = os.path.splitext(caller_filename_full[-1])[0]
         name = module + name
 

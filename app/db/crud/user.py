@@ -1,18 +1,25 @@
 from typing import Any, Dict, List, Optional
+
 from core.log import generate_logger
 from fastapi.encoders import jsonable_encoder
-
 from sqlalchemy.orm import Session
 
 from app.models.user import User
 
 logger = generate_logger()
 
+
 class CRUDUser:
     def get_user(self, db: Session, username: str) -> Optional[User]:
         return db.query(User).filter(User.username == username)
 
-    def get_users(self, db: Session, offset: int = 0, limit: int = 10, search: Optional[str] = None) -> List[User]:
+    def get_users(
+        self,
+        db: Session,
+        offset: int = 0,
+        limit: int = 10,
+        search: Optional[str] = None,
+    ) -> List[User]:
         query = db.query(User)
         if search:
             query = query.filter(User.username.ilike(f"%{search}%"))
@@ -31,7 +38,9 @@ class CRUDUser:
 
         return user
 
-    def update_user(self, db: Session, username: str, in_data: User | Dict[str, Any]) -> Optional[User]:
+    def update_user(
+        self, db: Session, username: str, in_data: User | Dict[str, Any]
+    ) -> Optional[User]:
         # verify drama exists within the database
         obj = db.query(User).filter(User.username == username).first()
         if not obj:
@@ -64,5 +73,3 @@ class CRUDUser:
         db.delete(obj)
         db.commit()
         return obj
-
-

@@ -4,7 +4,6 @@ from typing import Any, List, Optional, Tuple, Type
 
 import requests
 from bs4 import BeautifulSoup
-from sqlalchemy import Boolean
 
 from app.models.drama import Drama, Genre, Tag
 

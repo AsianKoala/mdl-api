@@ -1,12 +1,13 @@
 from typing import Any, Dict, List, Optional, Tuple
+
 from core.log import generate_logger
 from fastapi.encoders import jsonable_encoder
-
 from sqlalchemy.orm import Session
 
 from app.models.drama import Drama, Genre, Tag
 
 logger = generate_logger()
+
 
 class CRUDDrama:
     ATTR_UNION = Tag | Genre
@@ -15,7 +16,11 @@ class CRUDDrama:
         return db.query(Drama).filter(Drama.id == id).first()
 
     def get_dramas(
-        self, db: Session, offset: int = 0, limit: int = 10, search: Optional[str] = None
+        self,
+        db: Session,
+        offset: int = 0,
+        limit: int = 10,
+        search: Optional[str] = None,
     ) -> List[Drama]:
         query = db.query(Drama)
         if search:

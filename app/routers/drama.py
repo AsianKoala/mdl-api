@@ -126,7 +126,7 @@ async def get_dramas(
     tags: List[int] = Query(None),
     search: Optional[str] = None,
     limit: int = 10,
-    offset: int = 0
+    offset: int = 0,
 ) -> List[Drama]:
     sql = text(build_sql(genres, tags, search, limit, offset))
     rows = db.execute(sql)

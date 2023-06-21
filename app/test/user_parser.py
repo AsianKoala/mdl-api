@@ -1,8 +1,6 @@
-from bs4 import BeautifulSoup
+import schemas
 from database import SessionLocal
 from db.crud.user import CRUDUser
-import requests
-import schemas
 
 from app.scrapers.user import UserParser
 
@@ -10,7 +8,7 @@ from app.scrapers.user import UserParser
 def main():
     parser = UserParser()
     parser.scrape("koawa")
-    model = parser.parse_model()
+    parser.parse_model()
     crud = CRUDUser()
     db = SessionLocal()
 
@@ -19,8 +17,6 @@ def main():
     db_obj = crud.get_users(db)[0]
     user = schemas.User.from_orm(db_obj)
     print(user)
-
-
 
 
 if __name__ == "__main__":

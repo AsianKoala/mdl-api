@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional, Tuple, Type
+from typing import Any, List, Optional, Type
 
 import requests
 from bs4 import BeautifulSoup
+
 
 class CommonParser(ABC):
     BASE_URL = "https://mydramalist.com"
@@ -22,7 +23,7 @@ class CommonParser(ABC):
                     text = type(text)
                 return text
         return None
-    
+
     def scrape(self, query: str) -> bool:
         query = self.process_query(query)
         r = requests.get(self.BASE_URL + "/" + query)
@@ -38,4 +39,3 @@ class CommonParser(ABC):
     @abstractmethod
     def parse_model(self) -> Any:
         pass
-
