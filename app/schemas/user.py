@@ -1,10 +1,10 @@
+from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel
-from schemas.drama import DramaBase
 
 
-class UserBase(BaseModel):
+class User(BaseModel):
     username: str
     following: int
     followers: int
@@ -13,7 +13,7 @@ class UserBase(BaseModel):
     gender: Optional[str]
     location: Optional[str]
     contribution_points: str
-    roles: str
+    roles: List[str]
     join_date: str
     show_watchtime: Optional[str]
     episodes: Optional[str]
@@ -23,9 +23,3 @@ class UserBase(BaseModel):
 
     class Config:
         orm_mode = True
-
-class User:
-    watchlist: List[DramaBase]
-
-class UserDB(UserBase):
-    id: int

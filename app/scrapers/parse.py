@@ -28,7 +28,7 @@ class DramaParser:
                 return text
         return None
 
-    def scrape(self, id: str) -> Boolean:
+    def scrape(self, id: str) -> bool:
         self.id = id
         r = requests.get(self.BASE_URL + "/" + id)
         if r.status_code == 404:

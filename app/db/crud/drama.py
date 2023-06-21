@@ -2,7 +2,6 @@ from typing import Any, Dict, List, Optional, Tuple
 from core.log import generate_logger
 from fastapi.encoders import jsonable_encoder
 
-import schemas
 from sqlalchemy.orm import Session
 
 from app.models.drama import Drama, Genre, Tag
@@ -16,7 +15,7 @@ class CRUDDrama:
         return db.query(Drama).filter(Drama.id == id).first()
 
     def get_dramas(
-        self, db: Session, offset: int = 0, limit: int = 0, search: Optional[str] = None
+        self, db: Session, offset: int = 0, limit: int = 10, search: Optional[str] = None
     ) -> List[Drama]:
         query = db.query(Drama)
         if search:
@@ -47,12 +46,11 @@ class CRUDDrama:
                 db.add(vals[i])
                 db.commit()
 
-    def create_drama(self, db: Session, drama: Drama) -> Drama:
+    def create_drama(self, db: Session, drama: Drama) -> Optional[Drama]:
         # check if drama already exists
-        schemas.Drama.validate(drama)
         obj = db.query(Drama).filter(Drama.id == drama.id).first()
         if obj:
-            print(f"Drama id={drama.id} already exists within database")
+            logger.error(f"Drama id={drama.id} already exists within database")
             return None
 
         clean_t, add_t = self.__clean_type(db, Tag, drama.tags)
@@ -74,12 +72,12 @@ class CRUDDrama:
         # verify drama exists within the database
         obj = db.query(Drama).filter(Drama.id == short_id).first()
         if not obj:
+            logger.error(f"Drama id={short_id} does not exist within database")
             return None
 
         data = jsonable_encoder(obj)
 
         if isinstance(in_data, dict):
-            data = jsonable_encoder(obj)
             for attr in data:
                 if attr in in_data:
                     setattr(obj, attr, in_data[attr])
@@ -97,7 +95,7 @@ class CRUDDrama:
     def delete_drama(self, db: Session, short_id: int) -> Optional[Drama]:
         obj = db.query(Drama).filter(Drama.id == short_id).first()
         if not obj:
-            print(f"Drama id={short_id} not found in the database")
+            logger.error(f"Drama id={short_id} not found in the database")
             return None
 
         db.delete(obj)

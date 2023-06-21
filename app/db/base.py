@@ -6,3 +6,4 @@ from app.models.drama import DramaTag  # noqa
 from app.models.drama import Genre  # noqa
 from app.models.drama import IDCache  # noqa
 from app.models.drama import Tag  # noqa
+from app.models.user import User

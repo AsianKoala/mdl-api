@@ -52,8 +52,6 @@ class Drama(Base):
     genres = relationship("Genre", secondary="drama_genre", back_populates="drama")
     tags = relationship("Tag", secondary="drama_tag", back_populates="drama")
 
-    users = relationship("User", secondary="user_drama", back_populates="watchlist")
-
 
 class Genre(Base):
     __tablename__ = "genres"

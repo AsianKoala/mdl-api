@@ -6,6 +6,7 @@ from middleware import FlattenQueryStringListMiddleware
 from app.routers import drama
 from app.routers import genres
 from app.routers import tags
+from app.routers import user
 
 logger = generate_logger()
 logger.info("Starting API")
@@ -27,6 +28,7 @@ app.add_middleware(FlattenQueryStringListMiddleware)
 app.include_router(drama.router)
 app.include_router(genres.router)
 app.include_router(tags.router)
+app.include_router(user.router)
 
 
 @app.get("/")

@@ -57,6 +57,7 @@ def __fetch_drama(
             logger.info("Created drama (id=%s) on get", long_id)
             db.refresh(model)
             return model
+
         else:
             logger.error("Drama (id=%s) does not exist", long_id)
             return None
