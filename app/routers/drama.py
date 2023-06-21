@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from core.log import generate_logger
 from db.crud.drama import CRUDDrama
-from fastapi import APIRouter, BackgroundTasks, Depends, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from scrapers.parse import DramaParser
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -59,8 +59,10 @@ def __fetch_drama(
             return model
 
         else:
-            logger.error("Drama (id=%s) does not exist", long_id)
-            return None
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Drama (id={long_id}) does not exist",
+            )
 
 
 def build_sql(

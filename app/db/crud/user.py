@@ -11,7 +11,7 @@ logger = generate_logger()
 
 class CRUDUser:
     def get_user(self, db: Session, username: str) -> Optional[User]:
-        return db.query(User).filter(User.username == username)
+        return db.query(User).filter(User.username == username).first()
 
     def get_users(
         self,
