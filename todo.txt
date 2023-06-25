@@ -1,2 +1,4 @@
 - Implement Schemas in CRUD
-- User / Watchlist
+- Watchlist
+- Cast
+- Actors

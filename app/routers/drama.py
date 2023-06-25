@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from core.log import generate_logger
 from db.crud.drama import CRUDDrama
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
 from scrapers.parse import DramaParser
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -32,11 +32,19 @@ def __check_update(db: Session, drama: Drama):
     else:
         logger.info("Not reparsing drama (id=%s)", drama.id)
 
+def __update_idcache(db: Session, model: Drama):
+    query = db.query(IDCache).filter(IDCache.id == model.id).first()
+    if not query:
+        logger.info("Added (id=%s) to IDCache", model.id)
+        db.add(IDCache(id=model.id, long_id=model.full_id))
+        db.commit()
 
 def __fetch_drama(
     model: Optional[Drama], long_id: str, background_tasks: BackgroundTasks, db: Session
 ) -> Optional[Drama]:
+    # update id cache if necessary
     if model:
+        background_tasks.add_task(__update_idcache, db, model)
         background_tasks.add_task(__check_update, db, model)
         return model
 
@@ -47,11 +55,7 @@ def __fetch_drama(
         if status:
             model = parser.parse_model()
 
-            # let's also update IDCache if necessary
-            id_check = db.query(IDCache).filter(IDCache.long_id == long_id).first()
-            if not id_check:
-                db.add(IDCache(id=model.id, long_id=long_id))
-                db.commit()
+            background_tasks.add_task(__check_update, db, model)
 
             crud.create_drama(db, model)
             logger.info("Created drama (id=%s) on get", long_id)
@@ -140,14 +144,19 @@ async def get_dramas(
 async def get_drama(
     id: int, background_tasks: BackgroundTasks, db: Session = Depends(get_db)
 ):
-    long_id = db.query(IDCache).filter(IDCache.id == id).first()
+    id_cache = db.query(IDCache).filter(IDCache.id == id).first()
     model = db.query(Drama).filter(Drama.id == id).first()
-    return __fetch_drama(model, long_id, background_tasks, db)
+    if not id_cache and not model:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Drama (id={id}) does not exist"
+        )
+    return __fetch_drama(model, id_cache.long_id, background_tasks, db)
 
 
-@router.get("/long/{long_id}", response_model=schemas.Drama)
+@router.get("/{long_id}/long", response_model=schemas.Drama)
 async def get_longid_drama(
     long_id: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)
 ):
     model = db.query(Drama).filter(Drama.full_id == long_id).first()
-    return __fetch_drama(model, background_tasks, db)
+    return __fetch_drama(model, long_id, background_tasks, db)

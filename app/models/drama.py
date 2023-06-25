@@ -1,25 +1,42 @@
-from sqlalchemy import ARRAY, Column, DateTime, Float, ForeignKey, Integer, String, func
+import enum
+from sqlalchemy import ARRAY, Column, DateTime, Enum, Float, ForeignKey, Integer, String, func
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 
-
 class DramaGenre(Base):
     __tablename__ = "drama_genre"
 
-    drama_id = Column(Integer, ForeignKey("dramas.id"), primary_key=True)
-    genre_id = Column(Integer, ForeignKey("genres.id"), primary_key=True)
+    drama_id = Column(Integer, ForeignKey("drama.id"), primary_key=True)
+    genre_id = Column(Integer, ForeignKey("genre.id"), primary_key=True)
 
 
 class DramaTag(Base):
     __tablename__ = "drama_tag"
 
-    drama_id = Column(Integer, ForeignKey("dramas.id"), primary_key=True)
-    tag_id = Column(Integer, ForeignKey("tags.id"), primary_key=True)
+    drama_id = Column(Integer, ForeignKey("drama.id"), primary_key=True)
+    tag_id = Column(Integer, ForeignKey("tag.id"), primary_key=True)
+
+
+class WatchlistType(enum.Enum):
+    currently_watching = 1
+    completed = 2
+    plan_to_watch = 3
+    on_hold = 4
+    dropped = 5
+
+
+class DramaUser(Base):
+    __tablename__ = "drama_user"
+    drama_id = Column(Integer, ForeignKey("drama.id"), primary_key=True)
+    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
+    status = Column(Enum(WatchlistType))
+    drama = relationship("Drama", back_populates="users")
+    user = relationship("User", back_populates="dramas")
 
 
 class Drama(Base):
-    __tablename__ = "dramas"
+    __tablename__ = "drama"
 
     id = Column(Integer, primary_key=True)
     parse_date = Column(
@@ -49,24 +66,26 @@ class Drama(Base):
     ranked = Column(Integer, nullable=True)
     popularity = Column(Integer, nullable=True)
 
-    genres = relationship("Genre", secondary="drama_genre", back_populates="drama")
-    tags = relationship("Tag", secondary="drama_tag", back_populates="drama")
+    genres = relationship("Genre", secondary="drama_genre", back_populates="dramas")
+    tags = relationship("Tag", secondary="drama_tag", back_populates="dramas")
+
+    users = relationship("DramaUser", back_populates="drama")
 
 
 class Genre(Base):
-    __tablename__ = "genres"
+    __tablename__ = "genre"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
-    drama = relationship("Drama", secondary="drama_genre", back_populates="genres")
+    dramas = relationship("Drama", secondary="drama_genre", back_populates="genres")
 
 
 class Tag(Base):
-    __tablename__ = "tags"
+    __tablename__ = "tag"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
-    drama = relationship("Drama", secondary="drama_tag", back_populates="tags")
+    dramas = relationship("Drama", secondary="drama_tag", back_populates="tags")
 
 
 class IDCache(Base):
@@ -74,3 +93,5 @@ class IDCache(Base):
 
     id = Column(Integer, primary_key=True, unique=True)
     long_id = Column(String, nullable=False)
+
+
