@@ -43,7 +43,7 @@ def __fetch_user(
 
     else:
         parser = UserParser()
-        is_success = parser.scrape()
+        is_success = parser.scrape(username)
 
         if is_success:
             model = parser.parse_model()

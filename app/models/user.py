@@ -1,3 +1,6 @@
+# import this for DramaUser relationship
+from app.models.drama import DramaUser  # noqa
+
 from sqlalchemy import ARRAY, Column, DateTime, Integer, String, func
 from sqlalchemy.orm import relationship
 
@@ -27,4 +30,3 @@ class User(Base):
     movies = Column(Integer, nullable=True)
 
     dramas = relationship("DramaUser", back_populates="user")
-
