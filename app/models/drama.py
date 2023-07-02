@@ -1,8 +1,8 @@
-import enum
-from sqlalchemy import ARRAY, Column, DateTime, Enum, Float, ForeignKey, Integer, String, func
+from sqlalchemy import ARRAY, Column, DateTime, Float, ForeignKey, Integer, String, func
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
+
 
 class DramaGenre(Base):
     __tablename__ = "drama_genre"
@@ -16,23 +16,6 @@ class DramaTag(Base):
 
     drama_id = Column(Integer, ForeignKey("drama.id"), primary_key=True)
     tag_id = Column(Integer, ForeignKey("tag.id"), primary_key=True)
-
-
-class WatchlistType(enum.Enum):
-    currently_watching = 1
-    completed = 2
-    plan_to_watch = 3
-    on_hold = 4
-    dropped = 5
-
-
-class DramaUser(Base):
-    __tablename__ = "drama_user"
-    drama_id = Column(Integer, ForeignKey("drama.id"), primary_key=True)
-    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
-    status = Column(Enum(WatchlistType))
-    drama = relationship("Drama", back_populates="users")
-    user = relationship("User", back_populates="dramas")
 
 
 class Drama(Base):
@@ -69,8 +52,6 @@ class Drama(Base):
     genres = relationship("Genre", secondary="drama_genre", back_populates="dramas")
     tags = relationship("Tag", secondary="drama_tag", back_populates="dramas")
 
-    users = relationship("DramaUser", back_populates="drama")
-
 
 class Genre(Base):
     __tablename__ = "genre"
@@ -93,5 +74,3 @@ class IDCache(Base):
 
     id = Column(Integer, primary_key=True, unique=True)
     long_id = Column(String, nullable=False)
-
-

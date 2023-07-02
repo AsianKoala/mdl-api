@@ -1,10 +1,8 @@
-# import this for DramaUser relationship
-from app.models.drama import DramaUser  # noqa
-
+# import this for Watchlist relationship
 from sqlalchemy import ARRAY, Column, DateTime, Integer, String, func
-from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
+
 
 class User(Base):
     __tablename__ = "user"
@@ -28,5 +26,3 @@ class User(Base):
     shows = Column(Integer, nullable=True)
     movie_watchtime = Column(String, nullable=True)
     movies = Column(Integer, nullable=True)
-
-    dramas = relationship("DramaUser", back_populates="user")

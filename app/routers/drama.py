@@ -32,19 +32,21 @@ def __check_update(db: Session, drama: Drama):
     else:
         logger.info("Not reparsing drama (id=%s)", drama.id)
 
-def __update_idcache(db: Session, model: Drama):
+
+def update_idcache(db: Session, model: Drama):
     query = db.query(IDCache).filter(IDCache.id == model.id).first()
     if not query:
         logger.info("Added (id=%s) to IDCache", model.id)
         db.add(IDCache(id=model.id, long_id=model.full_id))
         db.commit()
 
+
 def __fetch_drama(
     model: Optional[Drama], long_id: str, background_tasks: BackgroundTasks, db: Session
 ) -> Optional[Drama]:
     # update id cache if necessary
     if model:
-        background_tasks.add_task(__update_idcache, db, model)
+        background_tasks.add_task(update_idcache, db, model)
         background_tasks.add_task(__check_update, db, model)
         return model
 
@@ -54,8 +56,6 @@ def __fetch_drama(
 
         if status:
             model = parser.parse_model()
-
-            background_tasks.add_task(__check_update, db, model)
 
             crud.create_drama(db, model)
             logger.info("Created drama (id=%s) on get", long_id)
@@ -149,7 +149,7 @@ async def get_drama(
     if not id_cache and not model:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Drama (id={id}) does not exist"
+            detail="Drama (id={id}) does not exist",
         )
     return __fetch_drama(model, id_cache.long_id, background_tasks, db)
 

@@ -2,14 +2,16 @@ from datetime import datetime
 from typing import List, Optional
 
 from core.log import generate_logger
-from db.crud.user import CRUDUser
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from scrapers.user import UserParser
 from sqlalchemy.orm import Session
 
 from app import schemas
 from app.database import get_db
+from app.db.crud.user import CRUDUser
 from app.models.user import User
+from app.models.watchlist import Watchlist
+from app.scrapers.watchlist import WatchlistParser
 
 router = APIRouter(prefix="/users", tags=["Users"])
 crud = CRUDUser()
@@ -59,6 +61,35 @@ def __fetch_user(
             )
 
 
+def __download_watchlist(db: Session, model: User):
+    watchlist = db.query(Watchlist).filter(Watchlist.id == model.id).first()
+
+    # check parse date
+    days = 0
+    if watchlist:
+        date = datetime.now()
+        update_date = watchlist.parse_date.replace(tzinfo=date.tzinfo)
+        time_delta = date - update_date
+        logger.info(
+            "Watchlist (username=%s) delta update time: %s",
+            model.username,
+            time_delta.__str__(),
+        )
+        days = time_delta.days
+
+    if not watchlist or days >= 1:
+        parser = WatchlistParser()
+        parser.scrape(model.username)
+        watchlist = parser.parse_model(db)
+
+        if watchlist:
+            logger.info("Downloaded watchlist for user (username=%s)", model.username)
+            db.add(watchlist)
+            db.commit()
+
+    return watchlist
+
+
 @router.get("/", response_model=List[schemas.User])
 async def get_users(
     background_tasks: BackgroundTasks,
@@ -70,6 +101,7 @@ async def get_users(
     models = crud.get_users(db, offset=offset, limit=limit, search=search)
     for model in models:
         background_tasks.add_task(__check_update, db, model)
+        background_tasks.add_task(__download_watchlist, db, model)
     return models
 
 
@@ -77,5 +109,16 @@ async def get_users(
 async def get_user(
     background_tasks: BackgroundTasks, username: str, db: Session = Depends(get_db)
 ) -> Optional[User]:
-    model = crud.get_user(db, username)
-    return __fetch_user(db, background_tasks, model, username)
+    cached_obj = crud.get_user(db, username)
+    model = __fetch_user(db, background_tasks, cached_obj, username)
+    background_tasks.add_task(__download_watchlist, db, model)
+    return model
+
+
+@router.get("/{username}/watchlist", response_model=schemas.Watchlist)
+async def get_watchlist(
+    background_tasks: BackgroundTasks, username: str, db: Session = Depends(get_db)
+) -> Optional[Watchlist]:
+    cached_obj = crud.get_user(db, username)
+    user_model = __fetch_user(db, background_tasks, cached_obj, username)
+    return __download_watchlist(db, user_model)

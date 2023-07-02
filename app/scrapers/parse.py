@@ -1,11 +1,13 @@
-import os
 import re
 from typing import Any, List, Optional, Tuple, Type
 
 import requests
 from bs4 import BeautifulSoup
+from core.log import generate_logger
 
 from app.models.drama import Drama, Genre, Tag
+
+logger = generate_logger()
 
 
 class DramaParser:
@@ -139,9 +141,7 @@ class DramaParser:
                 safe_cast(int, clean_str(m.group(4))),
             )
         except:
-            with open(os.path.join("app", ".cache", "error.html"), "w") as f:
-                f.write(self.soup.prettify())
-            raise Exception("shit got fucked")
+            return (None, None, None, None)
 
     def parse_native_title(self) -> Optional[str]:
         try:

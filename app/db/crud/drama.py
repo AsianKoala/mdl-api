@@ -15,6 +15,9 @@ class CRUDDrama:
     def get_drama_by_id(self, db: Session, id: int) -> Optional[Drama]:
         return db.query(Drama).filter(Drama.id == id).first()
 
+    def get_drama_by_full_id(self, db: Session, full_id: str) -> Optional[Drama]:
+        return db.query(Drama).filter(Drama.full_id == full_id).first()
+
     def get_dramas(
         self,
         db: Session,
@@ -68,6 +71,8 @@ class CRUDDrama:
 
         self.__add_type(db, clean_t, add_t)
         self.__add_type(db, clean_g, add_g)
+
+        logger.info("Created drama (id=%s)", drama.id)
 
         return drama
 
