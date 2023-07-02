@@ -49,16 +49,17 @@ def __fetch_user(
 
         if is_success:
             model = parser.parse_model()
-            crud.create_user(db, model)
-            logger.info("Created user (username=%s) on get", username)
-            db.refresh(model)
-            return model
+            if model:
+                crud.create_user(db, model)
+                logger.info("Created user (username=%s) on get", username)
+                db.refresh(model)
+                return model
 
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"User (username={username}) does not exist",
-            )
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User (username={username}) does not exist",
+        )
 
 
 def __download_watchlist(db: Session, model: User):

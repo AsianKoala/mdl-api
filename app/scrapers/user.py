@@ -1,10 +1,13 @@
 from typing import List, Optional, Tuple
 
 from bs4 import BeautifulSoup
+from core.log import generate_logger
 
 from app.models.user import User
 from app.scrapers.common import CommonParser
 
+
+logger = generate_logger()
 
 class UserParser(CommonParser):
     def process_query(self, query: str) -> str:
@@ -12,39 +15,44 @@ class UserParser(CommonParser):
         link = "profile/" + query
         return link
 
-    def parse_model(self) -> User:
-        episodes, shows = self.parse_episodes_shows()
+    def parse_model(self) -> Optional[User]:
+        try:
+            episodes, shows = self.parse_episodes_shows()
 
-        (
-            last_online,
-            gender,
-            location,
-            contribution_points,
-            roles,
-            join_date,
-        ) = self.parse_details()
+            (
+                last_online,
+                gender,
+                location,
+                contribution_points,
+                roles,
+                join_date,
+            ) = self.parse_details()
 
-        model_dict = {
-            "username": self.user,
-            "following": self.parse_following(),
-            "followers": self.parse_followers(),
-            "points": self.parse_points(),
-            "last_online": last_online,
-            "gender": gender,
-            "location": location,
-            "contribution_points": contribution_points,
-            "roles": roles,
-            "join_date": join_date,
-            "show_watchtime": self.parse_show_watchtime(),
-            "movie_watchtime": self.parse_movie_watchtime(),
-            "episodes": episodes,
-            "shows": shows,
-            "movie_watchtime": self.parse_movie_watchtime(),
-            "movies": self.parse_movies(),
-        }
+            model_dict = {
+                "username": self.user,
+                "following": self.parse_following(),
+                "followers": self.parse_followers(),
+                "points": self.parse_points(),
+                "last_online": last_online,
+                "gender": gender,
+                "location": location,
+                "contribution_points": contribution_points,
+                "roles": roles,
+                "join_date": join_date,
+                "show_watchtime": self.parse_show_watchtime(),
+                "movie_watchtime": self.parse_movie_watchtime(),
+                "episodes": episodes,
+                "shows": shows,
+                "movie_watchtime": self.parse_movie_watchtime(),
+                "movies": self.parse_movies(),
+            }
 
-        user = User(**model_dict)
-        return user
+            user = User(**model_dict)
+            return user
+
+        except:
+            logger.error("User (username=%s) does not exist", self.user)
+            return None
 
     def parse_following(self) -> str:
         element = self.soup.find("div", attrs={"class": "stats-following"})

@@ -52,9 +52,9 @@ def __fetch_drama(
 
     else:
         parser = DramaParser()
-        status = parser.scrape(long_id)
+        parser_status = parser.scrape(long_id)
 
-        if status:
+        if parser_status:
             model = parser.parse_model()
 
             crud.create_drama(db, model)
@@ -65,7 +65,7 @@ def __fetch_drama(
         else:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Drama (id={long_id}) does not exist",
+                detail=f"Drama (long_id={long_id}) does not exist",
             )
 
 
@@ -76,9 +76,9 @@ def build_sql(
     limit: Optional[int] = None,
     offset: Optional[int] = None,
 ) -> str:
-    select = "SELECT dramas.* FROM dramas"
+    select = "SELECT drama.* FROM drama"
     if search:
-        search_sql = "WHERE dramas.title ILIKE {} ".format(search)
+        search_sql = "WHERE drama.title ILIKE {} ".format(search)
     else:
         search_sql = ""
     if limit:
@@ -93,7 +93,7 @@ def build_sql(
     def __join_sql(x: str, ids: List[int]) -> str:
         first = """
             LEFT JOIN drama_{} 
-            ON dramas.id = drama_{}.drama_id AND drama_{}.{}_id IN ({})
+            ON drama.id = drama_{}.drama_id AND drama_{}.{}_id IN ({})
             """.format(
             *([x] * 4), "".join(["{}, "] * (len(ids) - 1)) + str(ids[len(ids) - 1])
         ).format(
@@ -101,10 +101,10 @@ def build_sql(
         )
 
         second = """
-            LEFT JOIN {}s
-            ON drama_{}.{}_id = {}s.id
-            GROUP BY dramas.id
-            HAVING COUNT(DISTINCT {}s.title) = {}
+            LEFT JOIN {}
+            ON drama_{}.{}_id = {}.id
+            GROUP BY drama.id
+            HAVING COUNT(DISTINCT {}.title) = {}
             """.format(
             *([x] * 5), len(ids)
         )
@@ -115,12 +115,17 @@ def build_sql(
         genre_sql = __join_sql("genre", genre_ids)
     else:
         genre_sql = ""
+
     if tag_ids:
         tag_sql = __join_sql("tag", tag_ids)
     else:
         tag_sql = ""
 
-    intersect = "INTERSECT\n"
+    if genre_sql and tag_sql:
+        intersect = "INTERSECT\n"
+    else:
+        intersect = ""
+
     sql = genre_sql + intersect + tag_sql + search_sql + limit_sql + offset_sql
     return sql
 
@@ -149,7 +154,7 @@ async def get_drama(
     if not id_cache and not model:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Drama (id={id}) does not exist",
+            detail=f"Drama (id={id}) does not exist",
         )
     return __fetch_drama(model, id_cache.long_id, background_tasks, db)
 
