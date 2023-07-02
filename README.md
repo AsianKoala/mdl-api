@@ -4,15 +4,22 @@ Unofficial MyDramaList REST API.
 Built using FastAPI and PostgreSQL.
 
 ## Installation
-Set your environment variables for the Postgres DB: `APP_USER`, `APP_IP`, and `APP_DB`.
+Set your environment variables for Postgres: `APP_USER`, `APP_IP`, and `APP_DB`  
 
-Create and initialize the DB with 
+Create venv, install deps, init DB  
 ```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+chmod +x ./scripts/*
 ./scripts/resetdb.sh
 ```
 
-and then run the web server.
+Run the web server  
 
 ```
 uvicorn app.main:app --reload --port 8000
 ```
+
+## Public API
+(soon)
