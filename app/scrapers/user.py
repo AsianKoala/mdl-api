@@ -6,8 +6,8 @@ from core.log import generate_logger
 from app.models.user import User
 from app.scrapers.common import CommonParser
 
-
 logger = generate_logger()
+
 
 class UserParser(CommonParser):
     def process_query(self, query: str) -> str:

@@ -55,7 +55,6 @@ def __fetch_user(
                 db.refresh(model)
                 return model
 
-
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User (username={username}) does not exist",
