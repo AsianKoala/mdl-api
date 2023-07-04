@@ -7,3 +7,4 @@
 - Fix parse_user_info (see id=735043-life). Does not work dramas that have not been released
 - Change watchlist's drama GET schema so I don't send a 6000 line json on watchlist endpoint
 - Add error handling on parsers
+- Add limit/search/etc queries on watchlist (maybe make a new router? not sure)
