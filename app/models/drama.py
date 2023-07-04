@@ -1,7 +1,22 @@
-from sqlalchemy import ARRAY, Column, DateTime, Float, ForeignKey, Integer, String, func
+from typing import List
+
+from sqlalchemy import ARRAY
+from sqlalchemy import Column
+from sqlalchemy import DateTime
+from sqlalchemy import Float
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy import func
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
+from app.models.cast import Actor
+from app.models.cast import Cinematographer
+from app.models.cast import Composer
+from app.models.cast import Director
+from app.models.cast import Screenwriter
 
 
 class DramaGenre(Base):
@@ -51,6 +66,22 @@ class Drama(Base):
 
     genres = relationship("Genre", secondary="drama_genre", back_populates="dramas")
     tags = relationship("Tag", secondary="drama_tag", back_populates="dramas")
+
+    directors: Mapped[List["Director"]] = relationship(
+        secondary="director_drama", back_populates="dramas"
+    )
+    screenwriters: Mapped[List["Screenwriter"]] = relationship(
+        secondary="screenwriter_drama", back_populates="dramas"
+    )
+    actors: Mapped[List["Actor"]] = relationship(
+        secondary="actor_drama", back_populates="dramas"
+    )
+    composers: Mapped[List["Composer"]] = relationship(
+        secondary="composer_drama", back_populates="dramas"
+    )
+    cinematographers: Mapped[List["Cinematographer"]] = relationship(
+        secondary="cinematographer_drama", back_populates="dramas"
+    )
 
 
 class Genre(Base):

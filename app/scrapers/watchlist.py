@@ -1,7 +1,8 @@
 from typing import Optional
 
 from core.log import generate_logger
-from fastapi import HTTPException, status
+from fastapi import HTTPException
+from fastapi import status
 from sqlalchemy.orm import Session
 
 from app.db.crud.drama import CRUDDrama
@@ -9,7 +10,7 @@ from app.models.user import User
 from app.models.watchlist import Watchlist
 from app.routers.drama import update_idcache
 from app.scrapers.common import CommonParser
-from app.scrapers.parse import DramaParser
+from app.scrapers.drama import DramaParser
 
 logger = generate_logger()
 

@@ -1,4 +1,6 @@
-from typing import List, Optional, Tuple
+from typing import List
+from typing import Optional
+from typing import Tuple
 
 from bs4 import BeautifulSoup
 from core.log import generate_logger

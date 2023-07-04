@@ -1,8 +1,14 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List
+from typing import Optional
 
 from core.log import generate_logger
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from fastapi import APIRouter
+from fastapi import BackgroundTasks
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import status
+from fastapi.encoders import jsonable_encoder
 from scrapers.user import UserParser
 from sqlalchemy.orm import Session
 
@@ -62,13 +68,13 @@ def __fetch_user(
 
 
 def __download_watchlist(db: Session, model: User):
-    watchlist = db.query(Watchlist).filter(Watchlist.id == model.id).first()
+    db_watchlist = db.query(Watchlist).filter(Watchlist.id == model.id).first()
 
     # check parse date
     days = 0
-    if watchlist:
+    if db_watchlist:
         date = datetime.now()
-        update_date = watchlist.parse_date.replace(tzinfo=date.tzinfo)
+        update_date = db_watchlist.parse_date.replace(tzinfo=date.tzinfo)
         time_delta = date - update_date
         logger.info(
             "Watchlist (username=%s) delta update time: %s",
@@ -77,17 +83,34 @@ def __download_watchlist(db: Session, model: User):
         )
         days = time_delta.days
 
-    if not watchlist or days >= 1:
+    if not db_watchlist or days >= 1:
         parser = WatchlistParser()
         parser.scrape(model.username)
         watchlist = parser.parse_model(db)
 
-        if watchlist:
+        # simply just add to db
+        if not db_watchlist:
             logger.info("Downloaded watchlist for user (username=%s)", model.username)
             db.add(watchlist)
             db.commit()
 
-    return watchlist
+        else:
+            logger.info("Updating watchlist for user (username=%s)", model.username)
+            update_data = jsonable_encoder(watchlist)
+            old_data = jsonable_encoder(db_watchlist)
+
+            for attr in old_data:
+                if attr in update_data:
+                    setattr(db_watchlist, attr, update_data[attr])
+
+            db_watchlist.parse_date = datetime.now()
+
+            db.commit()
+            db.refresh(db_watchlist)
+
+        db_watchlist = watchlist
+
+    return db_watchlist
 
 
 @router.get("/", response_model=List[schemas.User])

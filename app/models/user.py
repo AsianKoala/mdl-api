@@ -1,5 +1,10 @@
 # import this for Watchlist relationship
-from sqlalchemy import ARRAY, Column, DateTime, Integer, String, func
+from sqlalchemy import ARRAY
+from sqlalchemy import Column
+from sqlalchemy import DateTime
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy import func
 
 from app.db.base_class import Base
 

@@ -1,16 +1,23 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List
+from typing import Optional
 
 from core.log import generate_logger
 from db.crud.drama import CRUDDrama
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
-from scrapers.parse import DramaParser
+from fastapi import APIRouter
+from fastapi import BackgroundTasks
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import Query
+from fastapi import status
+from app.scrapers.drama import DramaParser
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app import schemas
 from app.database import get_db
-from app.models.drama import Drama, IDCache
+from app.models.drama import Drama
+from app.models.drama import IDCache
 
 router = APIRouter(prefix="/dramas", tags=["Dramas"])
 crud = CRUDDrama()

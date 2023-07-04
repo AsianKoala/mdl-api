@@ -1,10 +1,16 @@
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
 
 from core.log import generate_logger
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
-from app.models.drama import Drama, Genre, Tag
+from app.models.drama import Drama
+from app.models.drama import Genre
+from app.models.drama import Tag
 
 logger = generate_logger()
 

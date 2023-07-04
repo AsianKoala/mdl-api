@@ -10,8 +10,11 @@ from app.core.log import generate_logger
 from app.database import SessionLocal
 from app.db.base import Base
 from app.db.crud.drama import CRUDDrama
-from app.models.drama import Drama, Genre, Tag
-from app.scrapers.crawler import CrawlerOptions, IDCrawler
+from app.models.drama import Drama
+from app.models.drama import Genre
+from app.models.drama import Tag
+from app.scrapers.crawler import CrawlerOptions
+from app.scrapers.crawler import IDCrawler
 from app.scrapers.parse import DramaParser
 
 one = "35729-emergency-lands-of-love"

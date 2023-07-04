@@ -3,7 +3,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from middleware import FlattenQueryStringListMiddleware
 
-from app.routers import drama, genre, tag, user
+from app.routers import drama
+from app.routers import genre
+from app.routers import tag
+from app.routers import user
 
 logger = generate_logger()
 logger.info("Starting API")

@@ -1,5 +1,9 @@
-from abc import ABC, abstractmethod
-from typing import Any, List, Optional, Type
+from abc import ABC
+from abc import abstractmethod
+from typing import Any
+from typing import List
+from typing import Optional
+from typing import Type
 
 import requests
 from bs4 import BeautifulSoup

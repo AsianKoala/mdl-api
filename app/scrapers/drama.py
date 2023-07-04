@@ -1,11 +1,22 @@
 import re
-from typing import Any, List, Optional, Tuple, Type
+from typing import Any
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
 
 import requests
 from bs4 import BeautifulSoup
 from core.log import generate_logger
 
-from app.models.drama import Drama, Genre, Tag
+from app.models.drama import Drama
+from app.models.drama import Genre
+from app.models.drama import Tag
+from app.models.cast import Actor
+from app.models.cast import Cinematographer
+from app.models.cast import Composer
+from app.models.cast import Director
+from app.models.cast import Screenwriter
 
 logger = generate_logger()
 
