@@ -32,7 +32,7 @@ def __check_update(db: Session, drama: Drama):
 
     if time_delta.days >= 1:
         logger.info("Reparsing drama (id=%s)", drama.id)
-        parser = DramaParser()
+        parser = DramaParser(db)
         parser.scrape(drama.full_id)
         model = parser.parse_model()
         crud.update_drama(db, model.id, model)
@@ -58,7 +58,7 @@ def __fetch_drama(
         return model
 
     else:
-        parser = DramaParser()
+        parser = DramaParser(db)
         parser_status = parser.scrape(long_id)
 
         if parser_status:

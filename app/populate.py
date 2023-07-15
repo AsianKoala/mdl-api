@@ -15,7 +15,7 @@ from app.models.drama import Genre
 from app.models.drama import Tag
 from app.scrapers.crawler import CrawlerOptions
 from app.scrapers.crawler import IDCrawler
-from app.scrapers.parse import DramaParser
+from app.scrapers.drama import DramaParser
 
 one = "35729-emergency-lands-of-love"
 two = "49865-psycho-but-it-s-okay"

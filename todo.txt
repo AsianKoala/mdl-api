@@ -8,3 +8,4 @@
 - Change watchlist's drama GET schema so I don't send a 6000 line json on watchlist endpoint
 - Add error handling on parsers
 - Add limit/search/etc queries on watchlist (maybe make a new router? not sure)
+- Migrate to ruff for linting

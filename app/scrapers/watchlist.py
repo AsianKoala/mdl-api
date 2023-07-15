@@ -26,7 +26,7 @@ class WatchlistParser(CommonParser):
 
     def __parse_list(self, db: Session, cls: str) -> Optional[Watchlist]:
         crud = CRUDDrama()
-        drama_parser = DramaParser()
+        drama_parser = DramaParser(db)
 
         soup = self.soup.find("div", attrs={"class": cls}).find("tbody")
         dramas = soup.find_all("td", attrs={"class": "mdl-style-col-title sort1"})
